@@ -1,0 +1,11 @@
+build/
+bin/
+out/
+.vscode/
+.DS_Store
+*.user
+*.exe
+*.o
+*.obj
+vcpkg_installed/
+image.png
