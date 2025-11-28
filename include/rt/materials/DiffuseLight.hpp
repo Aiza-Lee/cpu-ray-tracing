@@ -23,7 +23,7 @@ public:
 	}
 
 	virtual glm::vec3 emitted(
-		const Ray& r_in, const HitRecord& rec, double u, double v, const glm::vec3& p
+		const Ray& r_in, const HitRecord& rec
 	) const override {
 		// 直接返回发光颜色
 		return emit;

@@ -36,7 +36,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
 
 	// 材质不散射光线，则返回自发光颜色
 	if (!rec.mat_ptr->scatter(r, rec, srec))
-		return rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
+		return rec.mat_ptr->emitted(r, rec);
 
 	// 镜面反射，直接递归追踪反射光线
 	if (srec.is_specular)
@@ -51,7 +51,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
 		p = std::clamp(p, 0.05f, 1.0f); // 限制最小概率
 
 		if (random_double() > p)
-			return rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
+			return rec.mat_ptr->emitted(r, rec);
 		
 		// 能量补偿
 		srec.attenuation /= p;
@@ -63,7 +63,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
 	auto pdf_val = pdf_ptr->value(scattered.direction());
 
 	// 如果 PDF 值为零，说明该方向不可达，直接返回自发光颜色
-	if (pdf_val <= 0) return rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
+	if (pdf_val <= 0) return rec.mat_ptr->emitted(r, rec);
 
 	// 计算材质的散射 PDF 值（BRDF 的一部分）
 	double scattering_pdf = rec.mat_ptr->scattering_pdf(r, rec, scattered);
@@ -76,7 +76,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
 	// 这里 srec.attenuation 包含了 BRDF 的颜色部分（albedo / pi），scattering_pdf 包含了 CosTheta / pi
 	glm::vec3 color_from_scatter = (srec.attenuation * (float)scattering_pdf * sample_color) / (float)pdf_val;
 
-	return rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p) + color_from_scatter;
+	return rec.mat_ptr->emitted(r, rec) + color_from_scatter;
 }
 
 void SoftTracer::m_write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color) {

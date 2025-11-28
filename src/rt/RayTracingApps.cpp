@@ -88,7 +88,7 @@ void RayTracingApps::cornell_box() {
 	const int image_width = 600;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
 	const int samples_per_pixel = 300;
-	const int max_depth = 60;
+	const int max_depth = 70;
 
 	// World
 	Scene world;
@@ -134,7 +134,7 @@ void RayTracingApps::mirror_box() {
 	const int image_width = 600;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
 	const int samples_per_pixel = 100;
-	const int max_depth = 50;
+	const int max_depth = 500;
 
 	Scene world;
 
@@ -149,24 +149,24 @@ void RayTracingApps::mirror_box() {
 
 	// mirror cornell box walls
 	// YZ plane left
-	world.add(std::make_shared<Quad>(glm::vec3(555,0,0), glm::vec3(0,555,0), glm::vec3(0,0,555), mirror_mat));
+	world.add(std::make_shared<Quad>(glm::vec3(560,0,0), glm::vec3(0,555,0), glm::vec3(-5,0,555), mirror_mat));
 	// YZ plane right
 	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(0,555,0), glm::vec3(0,0,555), mirror_mat));
 	// // XZ plane light
 	// world.add(std::make_shared<Quad>(glm::vec3(343, 554, 332), glm::vec3(-130,0,0), glm::vec3(0,0,-105), light));
 	// XZ plane floor
-	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(555,0,0), glm::vec3(0,0,555), gray));
+	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(700,0,0), glm::vec3(0,0,700), gray));
 	// XZ plane ceil
-	world.add(std::make_shared<Quad>(glm::vec3(0,555,0), glm::vec3(555,0,0), glm::vec3(0,0,555), mirror_mat));
+	world.add(std::make_shared<Quad>(glm::vec3(0,555,0), glm::vec3(700,0,0), glm::vec3(0,0,700), gray));
 	// XY plane back
 	world.add(std::make_shared<Quad>(glm::vec3(0,0,555), glm::vec3(555,0,0), glm::vec3(0,555,0), mirror_mat));
-
-	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(555,0,0), glm::vec3(0,555,0), mirror_mat));
+	// XY plane front
+	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(700,0,0), glm::vec3(0,700,0), mirror_mat));
 
 
 	world.add(std::make_shared<Sphere>(glm::vec3(278, 100, 278), 100, red));
 	world.add(std::make_shared<Sphere>(glm::vec3(378, 60, 100), 60, light));
-	world.add(std::make_shared<Sphere>(glm::vec3(350, 350, 350), 80, perfect_mirror_mat));
+	// world.add(std::make_shared<Sphere>(glm::vec3(350, 350, 350), 80, perfect_mirror_mat));
 
 	Camera cam(glm::vec3(10, 250, 40), glm::vec3(278, 278, 100), glm::vec3(0,1,0), 40, aspect_ratio);
 

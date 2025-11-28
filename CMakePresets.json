@@ -45,7 +45,9 @@
 			"displayName": "Linux Release配置",
 			"inherits": "linux-base",
 			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "Release"
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_CXX_FLAGS_RELEASE": "-O3 -march=native -ffast-math -DNDEBUG",
+				"CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON"
 			}
 		},
 		{

@@ -56,13 +56,10 @@ public:
 	 * 
 	 * @param r_in 入射光线。
 	 * @param rec 击中记录。
-	 * @param u 纹理坐标 u。
-	 * @param v 纹理坐标 v。
-	 * @param p 击中点。
 	 * @return glm::vec3 自发光颜色。
 	 */
 	virtual glm::vec3 emitted(
-		const Ray& r_in, const HitRecord& rec, double u, double v, const glm::vec3& p
+		const Ray& r_in, const HitRecord& rec
 	) const {
 		return glm::vec3(0,0,0);
 	}
