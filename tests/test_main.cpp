@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
-#include "rt/Ray.hpp"
-#include "rt/Sphere.hpp"
-#include "rt/Material.hpp"
+#include "rt/core/Ray.hpp"
+#include "rt/hittables/Sphere.hpp"
+#include "rt/materials/Lambertian.hpp"
 
 TEST_CASE("Ray At", "[ray]") {
     rt::Ray r(glm::vec3(0,0,0), glm::vec3(1,0,0));

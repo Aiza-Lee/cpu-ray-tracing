@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <memory>
-#include "rt/Ray.hpp"
+#include "rt/core/Ray.hpp"
 
 namespace rt {
 
@@ -15,17 +15,19 @@ struct HitRecord {
 	glm::vec3 normal;                  ///< 相交点处的表面法线。
 	std::shared_ptr<Material> mat_ptr; ///< 相交物体的材质指针。
 	double t;                          ///< 相交点处的光线参数 t。
+	double u;                          ///< 纹理坐标 u。
+	double v;                          ///< 纹理坐标 v。
 	bool front_face;                   ///< 如果光线击中表面的正面，则为真。
 
 	/**
-	 * @brief 初始化normal和front_face字段。
+	 * @brief 设置表面法线方向。
 	 * 
-	 * 判断光线击中的是物体的正面还是背面，并确保法线始终指向光线的反方向。
+	 * 确保法线始终指向光线入射方向的相反方向（即指向外部）。
 	 * 
 	 * @param r 入射光线。
-	 * @param outward_normal 表面的几何外法线。
+	 * @param outward_normal 几何表面法线（指向外部）。
 	 */
-	void set_face_normal(const Ray& r, const glm::vec3& outward_normal) {
+	inline void set_face_normal(const Ray& r, const glm::vec3& outward_normal) {
 		front_face = glm::dot(r.direction(), outward_normal) < 0;
 		normal = front_face ? outward_normal : -outward_normal;
 	}

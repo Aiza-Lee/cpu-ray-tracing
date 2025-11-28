@@ -1,6 +1,6 @@
 #pragma once
-#include "rt/Scene.hpp"
-#include "rt/Camera.hpp"
+#include "rt/hittables/Scene.hpp"
+#include "rt/core/Camera.hpp"
 #include <vector>
 #include <string>
 
@@ -24,6 +24,17 @@ public:
 	SoftTracer(int width, int height, int samples_per_pixel, int max_depth);
 
 	/**
+	 * @brief 设置背景颜色。
+	 * 
+	 * @param color 背景颜色。
+	 * @param use_gradient 是否使用天空渐变（如果为 true，则忽略 color）。
+	 */
+	void set_background(const glm::vec3& color, bool use_gradient = false) {
+		m_background_color = color;
+		m_use_sky_gradient = use_gradient;
+	}
+
+	/**
 	 * @brief 从相机视角渲染场景。
 	 * 
 	 * @param scene 要渲染的场景。
@@ -41,7 +52,7 @@ private:
 	 * @param depth 当前递归深度。
 	 * @return glm::vec3 计算得到的颜色。
 	 */
-	glm::vec3 _ray_color(const Ray& r, const Scene& world, int depth);
+	glm::vec3 m_ray_color(const Ray& r, const Scene& world, int depth);
 
 	/**
 	 * @brief 将像素的颜色写入图像数据缓冲区。
@@ -50,12 +61,14 @@ private:
 	 * @param index 缓冲区中的索引。
 	 * @param pixel_color 要写入的颜色。
 	 */
-	void _write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color);
+	void m_write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color);
 
-	int _image_width;       ///< 图像宽度。
-	int _image_height;      ///< 图像高度。
-	int _samples_per_pixel; ///< 每个像素的采样数。
-	int _max_depth;         ///< 最大递归深度。
+	int m_image_width;       ///< 图像宽度。
+	int m_image_height;      ///< 图像高度。
+	int m_samples_per_pixel; ///< 每个像素的采样数。
+	int m_max_depth;         ///< 最大递归深度。
+	glm::vec3 m_background_color = glm::vec3(0,0,0);
+	bool m_use_sky_gradient = true;
 };
 
 } // namespace rt

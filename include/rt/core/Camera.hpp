@@ -1,6 +1,6 @@
 #pragma once
-#include "rt/Utils.hpp"
-#include "rt/Ray.hpp"
+#include "rt/core/Utils.hpp"
+#include "rt/core/Ray.hpp"
 
 namespace rt {
 
@@ -38,10 +38,10 @@ public:
 	Ray get_ray(double s, double t) const;
 
 private:
-	glm::vec3 _origin;            ///< 摄像机原点位置。
-	glm::vec3 _lower_left_corner; ///< 视图平面的左下角。
-	glm::vec3 _horizontal;        ///< 视图平面的水平向量。
-	glm::vec3 _vertical;          ///< 视图平面的垂直向量。
+	glm::vec3 m_origin;            ///< 摄像机原点位置。
+	glm::vec3 m_lower_left_corner; ///< 视图平面的左下角。
+	glm::vec3 m_horizontal;        ///< 视图平面的水平向量。
+	glm::vec3 m_vertical;          ///< 视图平面的垂直向量。
 };
 
 } // namespace rt

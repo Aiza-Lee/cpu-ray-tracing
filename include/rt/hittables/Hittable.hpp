@@ -1,6 +1,6 @@
 #pragma once
-#include "rt/Ray.hpp"
-#include "rt/HitRecord.hpp"
+#include "rt/core/Ray.hpp"
+#include "rt/core/HitRecord.hpp"
 
 namespace rt {
 

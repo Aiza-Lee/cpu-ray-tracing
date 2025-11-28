@@ -14,7 +14,7 @@ public:
 	Ray() {}
 	
 	/**
-	 * @brief Construct a new Ray object.
+	 * @brief 创建一条新的光线。
 	 * 
 	 * @param origin 光线的起点。
 	 * @param direction 光线的方向。

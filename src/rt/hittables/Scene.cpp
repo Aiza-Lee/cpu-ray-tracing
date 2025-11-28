@@ -1,4 +1,4 @@
-#include "rt/Scene.hpp"
+#include "rt/hittables/Scene.hpp"
 
 namespace rt {
 

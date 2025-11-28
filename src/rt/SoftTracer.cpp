@@ -1,8 +1,10 @@
 #include "rt/SoftTracer.hpp"
-#include "rt/Material.hpp"
-#include "rt/Utils.hpp"
+#include "rt/materials/Material.hpp"
+#include "rt/core/Utils.hpp"
 #include <iostream>
 #include <fmt/core.h>
+#include <omp.h>
+#include <atomic>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
@@ -10,32 +12,74 @@
 namespace rt {
 
 SoftTracer::SoftTracer(int width, int height, int samples, int depth)
-	: _image_width(width), _image_height(height), _samples_per_pixel(samples), _max_depth(depth) {}
+	: m_image_width(width), m_image_height(height), m_samples_per_pixel(samples), m_max_depth(depth) {}
 
-glm::vec3 SoftTracer::_ray_color(const Ray& r, const Scene& world, int depth) {
+glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
 	HitRecord rec;
 
 	// 如果递归深度耗尽，返回黑色
 	if (depth <= 0)
 		return glm::vec3(0,0,0);
 
-	if (world.hit(r, 0.001, infinity, rec)) {
-		Ray scattered;
-		glm::vec3 attenuation;
-		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-			return attenuation * _ray_color(scattered, world, depth-1);
-		return glm::vec3(0,0,0);
+	if (!world.hit(r, 0.001, infinity, rec)) {
+		// 如果没有击中任何对象，返回背景色
+		if (m_use_sky_gradient) {
+			glm::vec3 unit_direction = glm::normalize(r.direction());
+			auto t = 0.5 * (unit_direction.y + 1.0);
+			return static_cast<float>(1.0-t)*glm::vec3(1.0, 1.0, 1.0) + static_cast<float>(t)*glm::vec3(0.5, 0.7, 1.0);
+		} else {
+			return m_background_color;
+		}
 	}
 
-	return glm::vec3(0,0,0);
+	ScatterRecord srec; // 存储散射信息
 
-	// // 如果没有击中任何对象，返回背景色（渐变天空）
-	// glm::vec3 unit_direction = glm::normalize(r.direction());
-	// auto t = 0.5 * (unit_direction.y + 1.0);
-	// return static_cast<float>(1.0-t)*glm::vec3(1.0, 1.0, 1.0) + static_cast<float>(t)*glm::vec3(0.5, 0.7, 1.0);
+	// 材质不散射光线，则返回自发光颜色
+	if (!rec.mat_ptr->scatter(r, rec, srec))
+		return rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
+
+	// 镜面反射，直接递归追踪反射光线
+	if (srec.is_specular)
+		return srec.attenuation * m_ray_color(srec.specular_ray, world, depth-1);
+
+	// 漫反射处理：使用 PDF 进行重要性采样
+	auto pdf_ptr = srec.pdf_ptr;
+
+	// 俄罗斯轮盘赌 (Russian Roulette)
+	if (depth < m_max_depth - 3) {
+		float p = std::max(srec.attenuation.x, std::max(srec.attenuation.y, srec.attenuation.z));
+		p = std::clamp(p, 0.05f, 1.0f); // 限制最小概率
+
+		if (random_double() > p)
+			return rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
+		
+		// 能量补偿
+		srec.attenuation /= p;
+	}
+	
+	// 生成散射光线方向
+	Ray scattered{ rec.p, pdf_ptr->generate() };
+	// 计算该方向的 PDF 值
+	auto pdf_val = pdf_ptr->value(scattered.direction());
+
+	// 如果 PDF 值为零，说明该方向不可达，直接返回自发光颜色
+	if (pdf_val <= 0) return rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
+
+	// 计算材质的散射 PDF 值（BRDF 的一部分）
+	double scattering_pdf = rec.mat_ptr->scattering_pdf(r, rec, scattered);
+
+	// 递归计算散射光线的颜色
+	glm::vec3 sample_color = m_ray_color(scattered, world, depth-1);
+	
+	// 渲染方程的蒙特卡洛估计：
+	// Color = Emitted + (BRDF * Li * CosTheta) / PDF
+	// 这里 srec.attenuation 包含了 BRDF 的颜色部分（albedo / pi），scattering_pdf 包含了 CosTheta / pi
+	glm::vec3 color_from_scatter = (srec.attenuation * (float)scattering_pdf * sample_color) / (float)pdf_val;
+
+	return rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p) + color_from_scatter;
 }
 
-void SoftTracer::_write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color) {
+void SoftTracer::m_write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color) {
 	auto r = pixel_color.x;
 	auto g = pixel_color.y;
 	auto b = pixel_color.z;
@@ -51,31 +95,37 @@ void SoftTracer::_write_color(std::vector<unsigned char>& image_data, int index,
 }
 
 void SoftTracer::render(const Scene& scene, const Camera& cam, const std::string& filename) {
-	std::vector<unsigned char> image_data(_image_width * _image_height * 3);
+	std::vector<unsigned char> image_data(m_image_width * m_image_height * 3);
 
-	for (int j = _image_height-1; j >= 0; --j) {
-		fmt::print("\rScanlines remaining: {} ", j);
-		std::fflush(stdout);
-		for (int i = 0; i < _image_width; ++i) {
+	std::atomic<int> scanlines_finished = 0;
+
+	#pragma omp parallel for schedule(dynamic, 1)
+	for (int j = m_image_height-1; j >= 0; --j) {
+		int finished = ++scanlines_finished;
+		if (finished % 10 == 0) {
+			fmt::print("\rScanlines remaining: {}   ", m_image_height - finished);
+			std::fflush(stdout);
+		}
+		for (int i = 0; i < m_image_width; ++i) {
 			glm::vec3 pixel_color(0,0,0);
-			for (int s = 0; s < _samples_per_pixel; ++s) {
-				auto u = (i + random_double()) / (_image_width-1);
-				auto v = (j + random_double()) / (_image_height-1);
+			for (int s = 0; s < m_samples_per_pixel; ++s) {
+				auto u = (i + random_double()) / (m_image_width-1);
+				auto v = (j + random_double()) / (m_image_height-1);
 				Ray r = cam.get_ray(u, v);
-				pixel_color += _ray_color(r, scene, _max_depth);
+				pixel_color += m_ray_color(r, scene, m_max_depth);
 			}
 			
-			pixel_color = pixel_color / static_cast<float>(_samples_per_pixel);
+			pixel_color = pixel_color / static_cast<float>(m_samples_per_pixel);
 
 			// 计算 stb_image 的索引（左上角为原点，但我们是从下往上循环，所以需要翻转 y 轴）
-			int row = _image_height - 1 - j;
-			int index = (row * _image_width + i) * 3;
-			_write_color(image_data, index, pixel_color);
+			int row = m_image_height - 1 - j;
+			int index = (row * m_image_width + i) * 3;
+			m_write_color(image_data, index, pixel_color);
 		}
 	}
 	fmt::print("\nDone.\n");
 
-	stbi_write_png(filename.c_str(), _image_width, _image_height, 3, image_data.data(), _image_width * 3);
+	stbi_write_png(filename.c_str(), m_image_width, m_image_height, 3, image_data.data(), m_image_width * 3);
 }
 
 } // namespace rt

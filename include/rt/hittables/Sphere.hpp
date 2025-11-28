@@ -1,5 +1,6 @@
 #pragma once
-#include "rt/Hittable.hpp"
+#include "rt/hittables/Hittable.hpp"
+#include "rt/materials/Material.hpp"
 #include <glm/glm.hpp>
 
 namespace rt {

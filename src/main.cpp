@@ -1,37 +1,28 @@
-#include "rt/SoftTracer.hpp"
-#include "rt/Sphere.hpp"
-#include "rt/Material.hpp"
-#include "rt/Scene.hpp"
-#include "rt/Camera.hpp"
+#include "rt/RayTracingApps.hpp"
 #include <iostream>
+#include <string>
 
-int main() {
-    // Image
-    const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 400;
-    const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int samples_per_pixel = 1000;
-    const int max_depth = 100;
+int main(int argc, char* argv[]) {
+	std::cout << "Select app to run:" << std::endl;
+	std::cout << "1. Random Spheres" << std::endl;
+	std::cout << "2. Simple Light" << std::endl;
+	std::cout << "3. Cornell Box" << std::endl;
+	
+	int choice = 1;
+	if (argc > 1) {
+		choice = std::stoi(argv[1]);
+	} else {
+		std::cout << "Enter choice (1-4): ";
+		std::cin >> choice;
+	}
 
-    // World
-    rt::Scene world;
+	switch(choice) {
+		case 1: rt::RayTracingApps::random_spheres(); break;
+		case 2: rt::RayTracingApps::simple_light(); break;
+		case 3: rt::RayTracingApps::cornell_box(); break;
+		case 4: rt::RayTracingApps::mirror_box(); break;
+		default: rt::RayTracingApps::random_spheres(); break;
+	}
 
-    auto material_ground = std::make_shared<rt::Lambertian>(glm::vec3(0.8, 0.8, 0.0));
-    auto material_center = std::make_shared<rt::Lambertian>(glm::vec3(0.1, 0.2, 0.5));
-    auto material_left   = std::make_shared<rt::Metal>(glm::vec3(0.8, 0.8, 0.8), 0.3);
-    auto material_right  = std::make_shared<rt::Metal>(glm::vec3(0.8, 0.6, 0.2), 1.0);
-
-    world.add(std::make_shared<rt::Sphere>(glm::vec3( 0.0, -100.5, -1.0), 100.0, material_ground));
-    world.add(std::make_shared<rt::Sphere>(glm::vec3( 0.0,    0.0, -1.0),   0.5, material_center));
-    world.add(std::make_shared<rt::Sphere>(glm::vec3(-1.0,    0.0, -1.0),   0.5, material_left));
-    world.add(std::make_shared<rt::Sphere>(glm::vec3( 1.0,    0.0, -1.0),   0.5, material_right));
-
-    // Camera
-    rt::Camera cam(glm::vec3(0,0,0), glm::vec3(0,0,-1), glm::vec3(0,1,0), 90, aspect_ratio);
-
-    // Render
-    rt::SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
-    tracer.render(world, cam, "image.png");
-
-    return 0;
+	return 0;
 }

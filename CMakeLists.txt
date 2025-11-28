@@ -12,18 +12,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(glm CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(Catch2 CONFIG REQUIRED)
+find_package(OpenMP REQUIRED)
 
 # Library
 add_library(rt_lib
-    src/rt/Sphere.cpp
-    src/rt/Scene.cpp
-    src/rt/Camera.cpp
-    src/rt/Material.cpp
+    src/rt/hittables/Sphere.cpp
+    src/rt/hittables/Scene.cpp
+    src/rt/hittables/Quad.cpp
+    src/rt/core/Camera.cpp
+    src/rt/materials/Lambertian.cpp
+    src/rt/materials/Metal.cpp
     src/rt/SoftTracer.cpp
+    src/rt/RayTracingApps.cpp
 )
 
 target_include_directories(rt_lib PUBLIC include)
-target_link_libraries(rt_lib PUBLIC glm::glm fmt::fmt)
+target_link_libraries(rt_lib PUBLIC glm::glm fmt::fmt OpenMP::OpenMP_CXX)
 
 # Main Executable
 add_executable(cpu-ray-tracing src/main.cpp)

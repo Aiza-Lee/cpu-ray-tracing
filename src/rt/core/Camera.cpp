@@ -1,4 +1,4 @@
-#include "rt/Camera.hpp"
+#include "rt/core/Camera.hpp"
 
 namespace rt {
 
@@ -18,14 +18,14 @@ Camera::Camera(
 	auto u = glm::normalize(glm::cross(vup, w));
 	auto v = glm::cross(w, u);
 
-	_origin = lookfrom;
-	_horizontal = static_cast<float>(viewport_width) * u;
-	_vertical = static_cast<float>(viewport_height) * v;
-	_lower_left_corner = _origin - _horizontal/2.0f - _vertical/2.0f - w;
+	m_origin = lookfrom;
+	m_horizontal = static_cast<float>(viewport_width) * u;
+	m_vertical = static_cast<float>(viewport_height) * v;
+	m_lower_left_corner = m_origin - m_horizontal/2.0f - m_vertical/2.0f - w;
 }
 
 Ray Camera::get_ray(double s, double t) const {
-	return Ray(_origin, _lower_left_corner + static_cast<float>(s)*_horizontal + static_cast<float>(t)*_vertical - _origin);
+	return Ray(m_origin, m_lower_left_corner + static_cast<float>(s)*m_horizontal + static_cast<float>(t)*m_vertical - m_origin);
 }
 
 } // namespace rt
