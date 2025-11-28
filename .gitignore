@@ -9,3 +9,4 @@ out/
 *.obj
 vcpkg_installed/
 image.png
+image2.png

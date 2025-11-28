@@ -4,9 +4,9 @@
 namespace rt {
 
 /**
- * @brief Class representing a ray.
+ * @brief 光线类。
  * 
- * A ray is defined by an origin point and a direction vector.
+ * 光线由一个起点和一个方向向量定义。
  * P(t) = origin + t * direction
  */
 class Ray {
@@ -16,37 +16,37 @@ public:
 	/**
 	 * @brief Construct a new Ray object.
 	 * 
-	 * @param origin The origin of the ray.
-	 * @param direction The direction of the ray.
+	 * @param origin 光线的起点。
+	 * @param direction 光线的方向。
 	 */
 	Ray(const glm::vec3& origin, const glm::vec3& direction)
-		: orig(origin), dir(direction) {}
+		: _orig(origin), _dir(direction) {}
 
 	/**
-	 * @brief Get the origin of the ray.
-	 * @return glm::vec3 The origin.
+	 * @brief 获取光线的起点。
+	 * @return glm::vec3 起点。
 	 */
-	glm::vec3 origin() const { return orig; }
+	glm::vec3 origin() const { return _orig; }
 
 	/**
-	 * @brief Get the direction of the ray.
-	 * @return glm::vec3 The direction.
+	 * @brief 获取光线的方向。
+	 * @return glm::vec3 方向。
 	 */
-	glm::vec3 direction() const { return dir; }
+	glm::vec3 direction() const { return _dir; }
 
 	/**
-	 * @brief Calculate the point at parameter t along the ray.
+	 * @brief 计算光线在参数 t 处的点。
 	 * 
-	 * @param t The parameter.
-	 * @return glm::vec3 The point P(t).
+	 * @param t 参数。
+	 * @return glm::vec3 点 P(t)。
 	 */
 	glm::vec3 at(double t) const {
-		return orig + static_cast<float>(t) * dir;
+		return _orig + static_cast<float>(t) * _dir;
 	}
 
 public:
-	glm::vec3 orig; ///< The origin of the ray.
-	glm::vec3 dir;  ///< The direction of the ray.
+	glm::vec3 _orig; ///< 光线的起点。
+	glm::vec3 _dir;  ///< 光线的方向。
 };
 
 } // namespace rt

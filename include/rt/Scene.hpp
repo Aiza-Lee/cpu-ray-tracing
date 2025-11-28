@@ -9,47 +9,47 @@ using std::shared_ptr;
 using std::make_shared;
 
 /**
- * @brief Class representing a scene (a list of hittable objects).
+ * @brief 场景类，包含多个可被光线击中的对象。
  */
 class Scene : public Hittable {
 public:
 	Scene() {}
 	
 	/**
-	 * @brief Construct a new Scene object with a single object.
+	 * @brief 使用单个对象构造新的场景对象。
 	 * 
-	 * @param object Pointer to the hittable object to add.
+	 * @param object 指向可被光线击中的对象的指针。
 	 */
 	Scene(shared_ptr<Hittable> object) { add(object); }
 
 	/**
-	 * @brief Clear all objects from the scene.
+	 * @brief 清空场景中的所有对象。
 	 */
 	void clear() { objects.clear(); }
 
 	/**
-	 * @brief Add a hittable object to the scene.
+	 * @brief 向场景中添加一个可被光线击中的对象。
 	 * 
-	 * @param object Pointer to the hittable object.
+	 * @param object 指向可被光线击中的对象的指针。
 	 */
 	void add(shared_ptr<Hittable> object) { objects.push_back(object); }
 
 	/**
-	 * @brief Determine if a ray hits any object in the scene.
+	 * @brief 判断光线是否击中场景中的任何对象。
 	 * 
-	 * Finds the closest hit in the range [t_min, t_max].
+	 * 查找在区间 [t_min, t_max] 内的最近击中。
 	 * 
-	 * @param r The ray to test.
-	 * @param t_min The minimum t value.
-	 * @param t_max The maximum t value.
-	 * @param rec Reference to a HitRecord to store the closest intersection details.
-	 * @return true If anything was hit.
-	 * @return false Otherwise.
+	 * @param r 要测试的光线。
+	 * @param t_min 最小的 t 值。
+	 * @param t_max 最大的 t 值。
+	 * @param rec 用于存储最近相交细节的击中记录引用。
+	 * @return true 如果有任何击中。
+	 * @return false 否则。
 	 */
 	virtual bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const override;
 
 public:
-	std::vector<shared_ptr<Hittable>> objects; ///< List of objects in the scene.
+	std::vector<shared_ptr<Hittable>> objects; ///< 场景中的对象列表。
 };
 
 } // namespace rt

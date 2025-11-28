@@ -5,44 +5,43 @@
 namespace rt {
 
 /**
- * @brief Camera class representing a virtual camera in the scene.
+ * @brief 表示场景中摄像机的类。
  * 
- * The camera is responsible for generating rays from the eye position
- * through the image plane.
+ * 摄像机负责从相机位置通过图像平面生成光线。
  */
 class Camera {
 public:
 	/**
-	 * @brief Construct a new Camera object.
+	 * @brief 构造一个新的 Camera 对象。
 	 * 
-	 * @param lookfrom The position of the camera.
-	 * @param lookat The point the camera is looking at.
-	 * @param vup The "up" vector for the camera orientation.
-	 * @param vfov Vertical field-of-view in degrees.
-	 * @param aspect_ratio The aspect ratio of the image (width / height).
+	 * @param lookfrom 摄像机的位置。
+	 * @param lookat 摄像机所看的点。
+	 * @param vup 摄像机的“上”向量。
+	 * @param vfov 垂直视场角，单位为度。
+	 * @param aspect_ratio 图像的宽高比（宽/高）。
 	 */
 	Camera(
 		glm::vec3 lookfrom,
 		glm::vec3 lookat,
 		glm::vec3 vup,
-		double vfov, // vertical field-of-view in degrees
+		double vfov,
 		double aspect_ratio
 	);
 
 	/**
-	 * @brief Generate a ray from the camera for a given pixel coordinate.
+	 * @brief 对于给定的图像平面坐标 (s, t)，生成一条光线。
 	 * 
-	 * @param s The horizontal coordinate fraction (0 to 1).
-	 * @param t The vertical coordinate fraction (0 to 1).
-	 * @return Ray The generated ray.
+	 * @param s 水平坐标分数（0 到 1）。
+	 * @param t 垂直坐标分数（0 到 1）。
+	 * @return Ray 生成的光线。
 	 */
 	Ray get_ray(double s, double t) const;
 
 private:
-	glm::vec3 origin;            ///< Camera origin position.
-	glm::vec3 lower_left_corner; ///< Lower left corner of the view plane.
-	glm::vec3 horizontal;        ///< Horizontal vector of the view plane.
-	glm::vec3 vertical;          ///< Vertical vector of the view plane.
+	glm::vec3 _origin;            ///< 摄像机原点位置。
+	glm::vec3 _lower_left_corner; ///< 视图平面的左下角。
+	glm::vec3 _horizontal;        ///< 视图平面的水平向量。
+	glm::vec3 _vertical;          ///< 视图平面的垂直向量。
 };
 
 } // namespace rt

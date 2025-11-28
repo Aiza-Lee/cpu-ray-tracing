@@ -5,21 +5,21 @@
 namespace rt {
 
 /**
- * @brief Abstract base class for objects that can be hit by a ray.
+ * @brief 描述可被光线击中的对象的抽象基类。
  */
 class Hittable {
 public:
 	virtual ~Hittable() = default;
 
 	/**
-	 * @brief Determine if a ray hits the object.
+	 * @brief 判断光线是否击中对象。
 	 * 
-	 * @param r The ray to test.
-	 * @param t_min The minimum t value to consider for a valid hit.
-	 * @param t_max The maximum t value to consider for a valid hit.
-	 * @param rec Reference to a HitRecord to store intersection details.
-	 * @return true If the ray hits the object within the range [t_min, t_max].
-	 * @return false Otherwise.
+	 * @param r 待测试的光线。
+	 * @param t_min 有效击中范围的最小 t 值。
+	 * @param t_max 有效击中范围的最大 t 值。
+	 * @param rec [out] 用于存储相交信息的 HitRecord 引用。
+	 * @return true 如果光线在范围 [t_min, t_max] 内击中对象。
+	 * @return false 否则。
 	 */
 	virtual bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const = 0;
 };

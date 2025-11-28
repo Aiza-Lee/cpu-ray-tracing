@@ -6,23 +6,23 @@
 namespace rt {
 
 /**
- * @brief Abstract base class for materials.
+ * @brief 材质的抽象基类。
  * 
- * Materials determine how rays interact with surfaces (scattering, absorption, etc.).
+ * 材质决定了光线与表面的相互作用（散射、吸收等）。
  */
 class Material {
 public:
 	virtual ~Material() = default;
 
 	/**
-	 * @brief Scatter a ray hitting the material.
+	 * @brief 散射击中材质的光线。
 	 * 
-	 * @param r_in The incoming ray.
-	 * @param rec The hit record containing intersection details.
-	 * @param attenuation Output color attenuation.
-	 * @param scattered Output scattered ray.
-	 * @return true If the ray is scattered.
-	 * @return false If the ray is absorbed.
+	 * @param r_in 入射光线。
+	 * @param rec 包含相交细节的击中记录。
+	 * @param attenuation [out] 输出颜色衰减。
+	 * @param scattered [out] 输出散射光线。
+	 * @return true 如果光线被散射。
+	 * @return false 如果光线被吸收。
 	 */
 	virtual bool scatter(
 		const Ray& r_in, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered
@@ -30,14 +30,14 @@ public:
 };
 
 /**
- * @brief Lambertian (diffuse) material.
+ * @brief 漫反射材质。
  */
 class Lambertian : public Material {
 public:
 	/**
 	 * @brief Construct a new Lambertian material.
 	 * 
-	 * @param a The albedo (color) of the material.
+	 * @param a 材质的反照率（颜色）。
 	 */
 	Lambertian(const glm::vec3& a) : albedo(a) {}
 
@@ -46,19 +46,19 @@ public:
 	) const override;
 
 public:
-	glm::vec3 albedo; ///< The albedo (reflectance) of the material.
+	glm::vec3 albedo; ///< 材质的反照率（颜色）。
 };
 
 /**
- * @brief Metal (reflective) material.
+ * @brief 金属（反射）材质。
  */
 class Metal : public Material {
 public:
 	/**
 	 * @brief Construct a new Metal material.
 	 * 
-	 * @param a The albedo (color) of the material.
-	 * @param f The fuzziness factor (0 for perfect mirror, 1 for very fuzzy).
+	 * @param a 材质的反照率（颜色）。
+	 * @param f 模糊度参数（0 表示完美镜面，1 表示非常模糊）。
 	 */
 	Metal(const glm::vec3& a, double f) : albedo(a), fuzz(f < 1 ? f : 1) {}
 
@@ -67,8 +67,8 @@ public:
 	) const override;
 
 public:
-	glm::vec3 albedo; ///< The albedo (reflectance) of the material.
-	double fuzz;      ///< Fuzziness parameter for blurry reflections.
+	glm::vec3 albedo; ///< 材质的反照率（颜色）。
+	double fuzz;      ///< 模糊度参数，用于模糊反射。
 };
 
 } // namespace rt

@@ -8,25 +8,24 @@ namespace rt {
 class Material; // Forward declaration
 
 /**
- * @brief Structure to record details of a ray-object intersection.
+ * @brief 记录光线与物体相交的信息。
  */
 struct HitRecord {
-	glm::vec3 p;                  ///< Point of intersection.
-	glm::vec3 normal;             ///< Surface normal at the intersection point.
-	std::shared_ptr<Material> mat_ptr; ///< Pointer to the material of the hit object.
-	double t;                     ///< Ray parameter t at the intersection point.
-	bool front_face;              ///< True if the ray hit the front face of the surface.
+	glm::vec3 p;                       ///< 相交点。
+	glm::vec3 normal;                  ///< 相交点处的表面法线。
+	std::shared_ptr<Material> mat_ptr; ///< 相交物体的材质指针。
+	double t;                          ///< 相交点处的光线参数 t。
+	bool front_face;                   ///< 如果光线击中表面的正面，则为真。
 
 	/**
-	 * @brief Set the face normal based on the ray direction and outward normal.
+	 * @brief 初始化normal和front_face字段。
 	 * 
-	 * Determines if the hit is on the front or back face and ensures the normal
-	 * always points against the ray.
+	 * 判断光线击中的是物体的正面还是背面，并确保法线始终指向光线的反方向。
 	 * 
-	 * @param r The incoming ray.
-	 * @param outward_normal The geometric outward normal of the surface.
+	 * @param r 入射光线。
+	 * @param outward_normal 表面的几何外法线。
 	 */
-	inline void set_face_normal(const Ray& r, const glm::vec3& outward_normal) {
+	void set_face_normal(const Ray& r, const glm::vec3& outward_normal) {
 		front_face = glm::dot(r.direction(), outward_normal) < 0;
 		normal = front_face ? outward_normal : -outward_normal;
 	}

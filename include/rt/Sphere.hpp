@@ -5,38 +5,38 @@
 namespace rt {
 
 /**
- * @brief Class representing a sphere object.
+ * @brief 球体类，表示三维空间中的一个球体对象。
  */
 class Sphere : public Hittable {
 public:
 	Sphere() {}
 	
 	/**
-	 * @brief Construct a new Sphere object.
+	 * @brief 构造一个新的球体对象。
 	 * 
-	 * @param cen Center of the sphere.
-	 * @param r Radius of the sphere.
-	 * @param m Material of the sphere.
+	 * @param cen 球体的中心。
+	 * @param r 球体的半径。
+	 * @param m 球体的材质。
 	 */
 	Sphere(glm::vec3 cen, double r, std::shared_ptr<Material> m)
 		: center(cen), radius(r), mat_ptr(m) {};
 
 	/**
-	 * @brief Determine if a ray hits the sphere.
+	 * @brief 判断光线是否击中球体。
 	 * 
-	 * @param r The ray to test.
-	 * @param t_min The minimum t value.
-	 * @param t_max The maximum t value.
-	 * @param rec Reference to a HitRecord to store intersection details.
-	 * @return true If the ray hits the sphere.
-	 * @return false Otherwise.
+	 * @param r 要测试的光线。
+	 * @param t_min 最小的 t 值。
+	 * @param t_max 最大的 t 值。
+	 * @param rec 用于存储击中细节的击中记录引用。
+	 * @return true 如果光线击中球体。
+	 * @return false 否则。
 	 */
 	virtual bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const override;
 
 public:
-	glm::vec3 center;                  ///< Center of the sphere.
-	double radius;                     ///< Radius of the sphere.
-	std::shared_ptr<Material> mat_ptr; ///< Material of the sphere.
+	glm::vec3 center;                  ///< 球体的中心。
+	double radius;                     ///< 球体的半径。
+	std::shared_ptr<Material> mat_ptr; ///< 球体的材质。
 };
 
 } // namespace rt
