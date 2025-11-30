@@ -1,28 +1,37 @@
-#include "rt/RayTracingApps.hpp"
-#include <iostream>
+#include "rt/apps/CornerBox.hpp"
+#include "rt/apps/MirrorBox.hpp"
+#include "rt/apps/RandomSpheres.hpp"
+#include "rt/apps/SimpleLight.hpp"
+#include "rt/apps/SimpleLightWrong.hpp"
+
 #include <string>
+#include <fmt/core.h>
+#include <iostream>
 
 int main(int argc, char* argv[]) {
-	std::cout << "Select app to run:" << std::endl;
-	std::cout << "1. Random Spheres" << std::endl;
-	std::cout << "2. Simple Light" << std::endl;
-	std::cout << "3. Cornell Box" << std::endl;
 	
-	int choice = 1;
-	if (argc > 1) {
-		choice = std::stoi(argv[1]);
-	} else {
-		std::cout << "Enter choice (1-4): ";
-		std::cin >> choice;
+	std::vector<std::unique_ptr<rt::Application>> apps;
+	apps.push_back(std::make_unique<rt::CornerBoxApp>());
+	apps.push_back(std::make_unique<rt::MirrorBoxApp>());
+	apps.push_back(std::make_unique<rt::RandomSpheresApp>());
+	apps.push_back(std::make_unique<rt::SimpleLightApp>());
+	apps.push_back(std::make_unique<rt::SimpleLightWrongApp>());
+
+	fmt::print("Available Applications:\n");
+	for (size_t i = 0; i < apps.size(); ++i) {
+		fmt::print("{}. {}\n", i + 1, apps[i]->name());
 	}
 
-	switch(choice) {
-		case 1: rt::RayTracingApps::random_spheres(); break;
-		case 2: rt::RayTracingApps::simple_light(); break;
-		case 3: rt::RayTracingApps::cornell_box(); break;
-		case 4: rt::RayTracingApps::mirror_box(); break;
-		default: rt::RayTracingApps::random_spheres(); break;
+	int choice = 0;
+	fmt::print("Select an application to run (1-{}): ", apps.size());
+	std::cin >> choice;
+
+	if (choice < 1 || choice > static_cast<int>(apps.size())) {
+		fmt::print("Invalid choice. Exiting.\n");
+		return 1;
 	}
+
+	apps[choice - 1]->run();
 
 	return 0;
 }

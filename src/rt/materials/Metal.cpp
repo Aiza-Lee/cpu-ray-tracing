@@ -4,7 +4,7 @@
 namespace rt {
 
 bool Metal::scatter(
-const Ray& r_in, const HitRecord& rec, ScatterRecord& srec
+	const Ray& r_in, const HitRecord& rec, ScatterRecord& srec
 ) const {
 	glm::vec3 reflected = glm::reflect(glm::normalize(r_in.direction()), rec.normal);
 	srec.specular_ray = Ray(rec.p, reflected + static_cast<float>(fuzz) * random_in_unit_sphere());

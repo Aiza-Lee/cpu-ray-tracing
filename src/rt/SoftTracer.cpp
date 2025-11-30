@@ -15,13 +15,13 @@ SoftTracer::SoftTracer(int width, int height, int samples, int depth)
 	: m_image_width(width), m_image_height(height), m_samples_per_pixel(samples), m_max_depth(depth) {}
 
 glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
-	HitRecord rec;
+	HitRecord hit_rec;
 
 	// 如果递归深度耗尽，返回黑色
 	if (depth <= 0)
 		return glm::vec3(0,0,0);
 
-	if (!world.hit(r, 0.001, infinity, rec)) {
+	if (!world.hit(r, 0.001, infinity, hit_rec)) {
 		// 如果没有击中任何对象，返回背景色
 		if (m_use_sky_gradient) {
 			glm::vec3 unit_direction = glm::normalize(r.direction());
@@ -35,48 +35,46 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
 	ScatterRecord srec; // 存储散射信息
 
 	// 材质不散射光线，则返回自发光颜色
-	if (!rec.mat_ptr->scatter(r, rec, srec))
-		return rec.mat_ptr->emitted(r, rec);
+	if (!hit_rec.mat_ptr->scatter(r, hit_rec, srec))
+		return hit_rec.mat_ptr->emitted(r, hit_rec);
 
 	// 镜面反射，直接递归追踪反射光线
 	if (srec.is_specular)
 		return srec.attenuation * m_ray_color(srec.specular_ray, world, depth-1);
 
-	// 漫反射处理：使用 PDF 进行重要性采样
-	auto pdf_ptr = srec.pdf_ptr;
+	auto pdf_ptr = srec.pdf_ptr;    // 散射方向分布
+	auto mat_ptr = hit_rec.mat_ptr; // 击中物体的材质
 
+	float rr_factor = 1.0f;
 	// 俄罗斯轮盘赌 (Russian Roulette)
 	if (depth < m_max_depth - 3) {
 		float p = std::max(srec.attenuation.x, std::max(srec.attenuation.y, srec.attenuation.z));
 		p = std::clamp(p, 0.05f, 1.0f); // 限制最小概率
-
 		if (random_double() > p)
-			return rec.mat_ptr->emitted(r, rec);
-		
+			return hit_rec.mat_ptr->emitted(r, hit_rec);
 		// 能量补偿
-		srec.attenuation /= p;
+		rr_factor = 1.0f / p;
 	}
 	
-	// 生成散射光线方向
-	Ray scattered{ rec.p, pdf_ptr->generate() };
-	// 计算该方向的 PDF 值
-	auto pdf_val = pdf_ptr->value(scattered.direction());
+	Ray scatter_ray{ hit_rec.p, pdf_ptr->generate() };      // 散射光线
+	auto pdf_val = pdf_ptr->value(scatter_ray.direction()); // 光线方向的 PDF 值
+	// 如果 PDF 值为零，说明该方向不可达，返回自发光颜色
+	if (pdf_val <= 0) return mat_ptr->emitted(r, hit_rec);
 
-	// 如果 PDF 值为零，说明该方向不可达，直接返回自发光颜色
-	if (pdf_val <= 0) return rec.mat_ptr->emitted(r, rec);
+	// 计算 BRDF 值
+	glm::vec3 brdf_val = mat_ptr->brdf(r, hit_rec, scatter_ray);
 
-	// 计算材质的散射 PDF 值（BRDF 的一部分）
-	double scattering_pdf = rec.mat_ptr->scattering_pdf(r, rec, scattered);
+	// 计算余弦项
+	auto cos_theta = glm::dot(hit_rec.normal, glm::normalize(scatter_ray.direction()));
+	if (cos_theta < 0) cos_theta = 0;
 
-	// 递归计算散射光线的颜色
-	glm::vec3 sample_color = m_ray_color(scattered, world, depth-1);
+	glm::vec3 L_i = m_ray_color(scatter_ray, world, depth-1);
 	
 	// 渲染方程的蒙特卡洛估计：
-	// Color = Emitted + (BRDF * Li * CosTheta) / PDF
-	// 这里 srec.attenuation 包含了 BRDF 的颜色部分（albedo / pi），scattering_pdf 包含了 CosTheta / pi
-	glm::vec3 color_from_scatter = (srec.attenuation * (float)scattering_pdf * sample_color) / (float)pdf_val;
+	// Lr = Emitted + (BRDF * Li * CosTheta) / PDF
+	glm::vec3 L_r = (brdf_val * L_i * (float)cos_theta * rr_factor) / (float)pdf_val;
 
-	return rec.mat_ptr->emitted(r, rec) + color_from_scatter;
+	return mat_ptr->emitted(r, hit_rec) + L_r;
 }
 
 void SoftTracer::m_write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color) {

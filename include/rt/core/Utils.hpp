@@ -50,8 +50,6 @@ inline double random_double(double min, double max) {
 
 /**
  * @brief 生成一个分量在 [0, 1) 范围内的随机向量。
- * 
- * @return glm::vec3 随机向量。
  */
 inline glm::vec3 random_vec3() {
 	return glm::vec3(random_double(), random_double(), random_double());
@@ -62,7 +60,6 @@ inline glm::vec3 random_vec3() {
  * 
  * @param min 最小值。
  * @param max 最大值。
- * @return glm::vec3 随机向量。
  */
 inline glm::vec3 random_vec3(double min, double max) {
 	return glm::vec3(random_double(min,max), random_double(min,max), random_double(min,max));
@@ -70,8 +67,6 @@ inline glm::vec3 random_vec3(double min, double max) {
 
 /**
  * @brief 在单位球体内生成一个随机点。
- * 
- * @return glm::vec3 单位球体内的随机点。
  */
 inline glm::vec3 random_in_unit_sphere() {
 	while (true) {
@@ -83,17 +78,25 @@ inline glm::vec3 random_in_unit_sphere() {
 
 /**
  * @brief 生成一个随机单位向量。
- * 
- * @return glm::vec3 随机单位向量。
  */
 inline glm::vec3 random_unit_vector() {
 	return glm::normalize(random_in_unit_sphere());
 }
 
 /**
+ * @brief 生成上半单位球面上的向量
+ */
+inline glm::vec3 random_unit_vector_hemisphere() {
+	while (true) {
+		auto p = random_vec3(-1,1);
+		if (glm::length2(p) >= 1) continue;
+		if (p.z < 0) p.z = -p.z;
+		return glm::normalize(p);
+	}
+}
+
+/**
  * @brief 生成一个随机的余弦方向向量。
- * 
- * @return glm::vec3 随机余弦方向向量。
  */
 inline glm::vec3 random_cosine_direction() {
 	auto r1 = random_double();

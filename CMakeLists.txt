@@ -14,16 +14,12 @@ find_package(fmt CONFIG REQUIRED)
 find_package(Catch2 CONFIG REQUIRED)
 find_package(OpenMP REQUIRED)
 
+# 收集 rt 目录下所有 cpp 文件
+file(GLOB_RECURSE RT_SOURCES src/rt/*.cpp)
+
 # Library
 add_library(rt_lib
-    src/rt/hittables/Sphere.cpp
-    src/rt/hittables/Scene.cpp
-    src/rt/hittables/Quad.cpp
-    src/rt/core/Camera.cpp
-    src/rt/materials/Lambertian.cpp
-    src/rt/materials/Metal.cpp
-    src/rt/SoftTracer.cpp
-    src/rt/RayTracingApps.cpp
+    ${RT_SOURCES}
 )
 
 target_include_directories(rt_lib PUBLIC include)

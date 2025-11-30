@@ -4,16 +4,16 @@
 namespace rt {
 
 /**
- * @brief 漫反射材质。
+ * @brief 错误的漫反射（未使用关于余弦的重要性采样）材质。
  */
-class Lambertian : public Material {
+class WrongLambertian : public Material {
 public:
 	/**
 	 * @brief  构造一个新的漫反射材质对象。
 	 * 
 	 * @param a 材质的反照率（颜色）。
 	 */
-	Lambertian(const glm::vec3& a) : albedo(a) {}
+	WrongLambertian(const glm::vec3& a) : albedo(a) {}
 
 	virtual bool scatter(
 		const Ray& r_in, const HitRecord& rec, ScatterRecord& srec

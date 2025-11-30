@@ -38,17 +38,17 @@ public:
 	}
 
 	/**
-	 * @brief 计算散射概率密度函数值。
+	 * @brief 计算双向反射分布函数 (BRDF) 值。
 	 * 
 	 * @param r_in 入射光线。
 	 * @param rec 击中记录。
 	 * @param scattered 散射光线。
-	 * @return double PDF 值。
+	 * @return glm::vec3 BRDF 值。
 	 */
-	virtual double scattering_pdf(
+	virtual glm::vec3 brdf(
 		const Ray& r_in, const HitRecord& rec, const Ray& scattered
 	) const {
-		return 0;
+		return glm::vec3(0,0,0);
 	}
 
 	/**
