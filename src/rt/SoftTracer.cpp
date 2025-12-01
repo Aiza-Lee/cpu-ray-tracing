@@ -23,7 +23,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::s
 	if (depth <= 0)
 		return glm::vec3(0,0,0);
 
-	if (!world.hit(r, 0.001, infinity, hit_rec)) {
+	if (!world.hit(r, RAY_T_MIN, infinity, hit_rec)) {
 		// 如果没有击中任何对象，返回背景色
 		if (m_use_sky_gradient) {
 			glm::vec3 unit_direction = glm::normalize(r.direction());
@@ -40,25 +40,25 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::s
 	if (!hit_rec.mat_ptr->scatter(r, hit_rec, srec))
 		return hit_rec.mat_ptr->emitted(r, hit_rec);
 
-	// 镜面反射，直接递归追踪反射光线
+	// 镜面反射，直接递归追踪反射光线，现在已与 PDF 采样合并
 	// if (srec.is_specular)
 	// 	return srec.attenuation * m_ray_color(srec.specular_ray, world, lights, depth-1);
 
-	auto pdf_ptr = srec.pdf_ptr;    // 散射方向分布
+	auto scatter_pdf_ptr = srec.pdf_ptr;    // 散射方向分布
 	auto mat_ptr = hit_rec.mat_ptr; // 击中物体的材质
 
 	float rr_factor = 1.0f;
 	// 俄罗斯轮盘赌 (Russian Roulette)
-	if (depth < m_max_depth - 3) {
+	if (depth < m_max_depth - RR_START_BOUNCE) {
 		float p = std::max(srec.attenuation.x, std::max(srec.attenuation.y, srec.attenuation.z));
-		p = std::clamp(p, 0.05f, 1.0f); // 限制最小概率
+		p = std::clamp(p, RR_MIN_PROBABILITY, 1.0f); // 限制最小概率
 		if (random_double() > p)
 			return hit_rec.mat_ptr->emitted(r, hit_rec);
 		// 能量补偿
 		rr_factor = 1.0f / p;
 	}
 	
-	std::shared_ptr<PDF> final_pdf_ptr = pdf_ptr;
+	std::shared_ptr<PDF> final_pdf_ptr = scatter_pdf_ptr;
 	
 	// 检查光源是否有效
 	bool has_lights = false;
@@ -77,25 +77,28 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::s
 		
 		switch (m_strategy) {
 			case SamplingStrategy::MIS:
-				final_pdf_ptr = make_shared<MixturePDF>(light_pdf_ptr, pdf_ptr);
+				final_pdf_ptr = make_shared<MixturePDF>(light_pdf_ptr, scatter_pdf_ptr);
 				break;
 			case SamplingStrategy::Light:
 				final_pdf_ptr = light_pdf_ptr;
 				break;
 			case SamplingStrategy::Material:
 			default:
-				final_pdf_ptr = pdf_ptr;
+				final_pdf_ptr = scatter_pdf_ptr;
 				break;
 		}
 	} else {
 		// 如果没有光源，强制使用材质采样
-		final_pdf_ptr = pdf_ptr;
+		final_pdf_ptr = scatter_pdf_ptr;
 	}
 
 	Ray scatter_ray{ hit_rec.p, final_pdf_ptr->generate() };      // 散射光线
 	auto pdf_val = final_pdf_ptr->value(scatter_ray.direction()); // 光线方向的 PDF 值
 	// 如果 PDF 值为零，说明该方向不可达，返回自发光颜色
-	if (pdf_val <= 0) return mat_ptr->emitted(r, hit_rec);
+	if (pdf_val <= 0) {
+		std::cerr << "Warning: PDF value is zero or negative." << std::endl;
+		return mat_ptr->emitted(r, hit_rec);
+	}
 
 	// 计算 BRDF 值
 	glm::vec3 brdf_val = mat_ptr->brdf(r, hit_rec, scatter_ray);

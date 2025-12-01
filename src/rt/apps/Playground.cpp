@@ -1,5 +1,6 @@
 #include "rt/apps/Playground.hpp"
 #include <iostream>
+#include <fmt/core.h>
 
 namespace rt {
 void PlaygroundApp::run() {
@@ -34,11 +35,11 @@ void PlaygroundApp::run() {
 	auto lights = std::make_shared<Scene>();
 	lights->add(light_shape);
 
-	auto mat_correct = std::make_shared<Lambertian>(glm::vec3(0.8, 0.8, 0.8));
-	world.add(std::make_shared<Sphere>(glm::vec3(180, 100, 250), 100, mat_correct));
+	auto mat_lambertian = std::make_shared<Lambertian>(glm::vec3(0.8, 0.8, 0.8));
+	world.add(std::make_shared<Sphere>(glm::vec3(180, 100, 220), 100, mat_lambertian));
 
-	auto mat_wrong = std::make_shared<Metal>(glm::vec3(1.0, 1.0, 1.0), 0);
-	world.add(std::make_shared<Sphere>(glm::vec3(375, 100, 250), 100, mat_wrong));
+	auto mat_metal = std::make_shared<Metal>(glm::vec3(1.0, 1.0, 1.0), 0);
+	world.add(std::make_shared<Sphere>(glm::vec3(375, 100, 350), 100, mat_metal));
 
 	// Camera
 	glm::vec3 lookfrom(278, 278, -780);
@@ -47,9 +48,31 @@ void PlaygroundApp::run() {
 		
 	Camera cam(lookfrom, lookat, vup, 40, aspect_ratio);
 
-	// Render
-	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
-	tracer.set_background(glm::vec3(0,0,0), false);
-	tracer.render(world, lights, cam, "temp.png");
+	// Render 1: MIS (Default)
+	{
+		fmt::print("\nRendering with MIS (Mixture Sampling)...\n");
+		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		tracer.set_background(glm::vec3(0,0,0), false);
+		tracer.set_sampling_strategy(SamplingStrategy::MIS);
+		tracer.render(world, lights, cam, "playground_mis.png");
+	}
+
+	// Render 2: Light Sampling Only
+	{
+		fmt::print("\nRendering with Light Sampling Only (NEE)...\n");
+		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		tracer.set_background(glm::vec3(0,0,0), false);
+		tracer.set_sampling_strategy(SamplingStrategy::Light);
+		tracer.render(world, lights, cam, "playground_light.png");
+	}
+
+	// Render 3: Material Sampling Only
+	{
+		fmt::print("\nRendering with Material Sampling Only (Standard Path Tracing)...\n");
+		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		tracer.set_background(glm::vec3(0,0,0), false);
+		tracer.set_sampling_strategy(SamplingStrategy::Material);
+		tracer.render(world, lights, cam, "playground_material.png");
+	}
 }
 } // namespace rt

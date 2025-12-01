@@ -47,6 +47,13 @@ public:
 		m_strategy = strategy;
 	}
 
+public:
+	// --- Constants ---
+	static constexpr double RAY_T_MIN = 0.001;       ///< 光线相交检测的最小 t 值（防止自相交）。
+	static constexpr int RR_START_BOUNCE = 3;        ///< 开始俄罗斯轮盘赌的弹射次数。
+	static constexpr float RR_MIN_PROBABILITY = 0.05f; ///< 俄罗斯轮盘赌的最小继续概率。
+	static constexpr float INDIRECT_LIGHT_CLAMP = 2000.0f; ///< 间接光照的钳位阈值（用于消除萤火虫）。
+
 	/**
 	 * @brief 从相机视角渲染场景。
 	 * 
