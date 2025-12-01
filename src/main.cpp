@@ -3,6 +3,8 @@
 #include "rt/apps/RandomSpheres.hpp"
 #include "rt/apps/SimpleLight.hpp"
 #include "rt/apps/SimpleLightWrong.hpp"
+#include "rt/apps/MisComparison.hpp"
+#include "rt/apps/Playground.hpp"
 
 #include <string>
 #include <fmt/core.h>
@@ -16,6 +18,8 @@ int main(int argc, char* argv[]) {
 	apps.push_back(std::make_unique<rt::RandomSpheresApp>());
 	apps.push_back(std::make_unique<rt::SimpleLightApp>());
 	apps.push_back(std::make_unique<rt::SimpleLightWrongApp>());
+	apps.push_back(std::make_unique<rt::MisComparisonApp>());
+	apps.push_back(std::make_unique<rt::PlaygroundApp>());
 
 	fmt::print("Available Applications:\n");
 	for (size_t i = 0; i < apps.size(); ++i) {

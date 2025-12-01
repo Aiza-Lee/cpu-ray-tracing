@@ -29,8 +29,9 @@ void RandomSpheresApp::run() {
 	Camera cam(glm::vec3(0,0,0), glm::vec3(0,0,-1), glm::vec3(0,1,0), 90, aspect_ratio);
 
 	// Render
+	auto lights = std::make_shared<Scene>();
 	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
 	tracer.set_background(glm::vec3(0.70, 0.80, 1.00), true); // Use sky gradient
-	tracer.render(world, cam, "random_spheres.png");
+	tracer.render(world, lights, cam, "random_spheres.png");
 }
 } // namespace rt

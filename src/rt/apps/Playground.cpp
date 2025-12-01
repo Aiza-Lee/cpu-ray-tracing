@@ -1,17 +1,16 @@
-#include "rt/apps/SimpleLightWrong.hpp"
+#include "rt/apps/Playground.hpp"
 #include <iostream>
 
 namespace rt {
-void SimpleLightWrongApp::run() {
-	std::cout << "Running Comparison Scene (Cosine vs Uniform)..." << std::endl;
+void PlaygroundApp::run() {
+	std::cout << "Running Playground..." << std::endl;
 
 	// Image
 	const auto aspect_ratio = 1.0;
 	const int image_width = 600;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
 		
-	// !!! 关键：使用低采样数来凸显噪声差异 !!!
-	const int samples_per_pixel = 1000; 
+	const int samples_per_pixel = 100; 
 	const int max_depth = 50;
 
 	// World
@@ -35,16 +34,10 @@ void SimpleLightWrongApp::run() {
 	auto lights = std::make_shared<Scene>();
 	lights->add(light_shape);
 
-	// --- 对比测试对象 ---
-		
-	// 左球：标准 Lambertian (Cosine Weighted Sampling)
-	// 预期结果：表面比较平滑，噪声较少
 	auto mat_correct = std::make_shared<Lambertian>(glm::vec3(0.8, 0.8, 0.8));
 	world.add(std::make_shared<Sphere>(glm::vec3(180, 100, 250), 100, mat_correct));
 
-	// 右球：Wrong Lambertian (Uniform Sampling)
-	// 预期结果：表面会有明显的噪点，特别是在阴影过渡区域
-	auto mat_wrong = std::make_shared<WrongLambertian>(glm::vec3(0.8, 0.8, 0.8));
+	auto mat_wrong = std::make_shared<Metal>(glm::vec3(1.0, 1.0, 1.0), 0);
 	world.add(std::make_shared<Sphere>(glm::vec3(375, 100, 250), 100, mat_wrong));
 
 	// Camera
@@ -57,6 +50,6 @@ void SimpleLightWrongApp::run() {
 	// Render
 	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
 	tracer.set_background(glm::vec3(0,0,0), false);
-	tracer.render(world, lights, cam, "comparison_sampling.png");
+	tracer.render(world, lights, cam, "temp.png");
 }
 } // namespace rt

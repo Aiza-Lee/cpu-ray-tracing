@@ -27,7 +27,12 @@ void CornerBoxApp::run() {
 	// YZ plane (Right Red)
 	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(0,555,0), glm::vec3(0,0,555), red));
 	// XZ plane (Light)
-	world.add(std::make_shared<Quad>(glm::vec3(343, 554, 332), glm::vec3(-130,0,0), glm::vec3(0,0,-105), light));
+	auto light_shape = std::make_shared<Quad>(glm::vec3(343, 554, 332), glm::vec3(-130,0,0), glm::vec3(0,0,-105), light);
+	world.add(light_shape);
+	
+	auto lights = std::make_shared<Scene>();
+	lights->add(light_shape);
+
 	// XZ plane (Floor White)
 	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(555,0,0), glm::vec3(0,0,555), white));
 	// XZ plane (Ceiling White)
@@ -48,7 +53,6 @@ void CornerBoxApp::run() {
 	// Render
 	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
 	tracer.set_background(glm::vec3(0,0,0), false);
-	tracer.render(world, cam, "cornell_box.png");
+	tracer.render(world, lights, cam, "corner_box.png");
 }
-
 } // namespace rt

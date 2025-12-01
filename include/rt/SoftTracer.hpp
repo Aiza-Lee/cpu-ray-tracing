@@ -6,6 +6,12 @@
 
 namespace rt {
 
+enum class SamplingStrategy {
+	MIS,        ///< 多重重要性采样 (默认)
+	Material,   ///< 仅材质采样 (BSDF)
+	Light       ///< 仅光源采样 (NEE)
+};
+
 /**
  * @brief 路径追踪渲染器类。
  * 
@@ -35,24 +41,33 @@ public:
 	}
 
 	/**
+	 * @brief 设置采样策略。
+	 */
+	void set_sampling_strategy(SamplingStrategy strategy) {
+		m_strategy = strategy;
+	}
+
+	/**
 	 * @brief 从相机视角渲染场景。
 	 * 
 	 * @param scene 要渲染的场景。
 	 * @param cam 视角相机。
 	 * @param filename 输出图像的文件名。
 	 */
-	void render(const Scene& scene, const Camera& cam, const std::string& filename);
+	void render(const Scene& scene, const std::shared_ptr<Hittable>& lights, const Camera& cam, const std::string& filename);
 
 private:
 	/**
 	 * @brief 计算光线的颜色。
 	 * 
 	 * @param r 光线。
-	 * @param world 包含对象的场景。
+	 * @param world 场景。
+	 * @param lights 光源列表。
 	 * @param depth 当前递归深度。
-	 * @return glm::vec3 计算得到的颜色。
+	 * @return glm::vec3 光线颜色。
 	 */
-	glm::vec3 m_ray_color(const Ray& r, const Scene& world, int depth);
+	glm::vec3 m_ray_color(const Ray& r, const Scene& world, const std::shared_ptr<Hittable>& lights, int depth);
+
 
 	/**
 	 * @brief 将像素的颜色写入图像数据缓冲区。
@@ -69,6 +84,7 @@ private:
 	int m_max_depth;         ///< 最大递归深度。
 	glm::vec3 m_background_color = glm::vec3(0,0,0);
 	bool m_use_sky_gradient = true;
+	SamplingStrategy m_strategy = SamplingStrategy::MIS;
 };
 
 } // namespace rt

@@ -48,6 +48,10 @@ inline double random_double(double min, double max) {
 	return min + (max - min) * random_double();
 }
 
+inline int random_int(int min, int max) {
+	return static_cast<int>(random_double(min, max + 1));
+}
+
 /**
  * @brief 生成一个分量在 [0, 1) 范围内的随机向量。
  */
@@ -106,6 +110,21 @@ inline glm::vec3 random_cosine_direction() {
 	auto phi = 2*pi*r1;
 	auto x = cos(phi)*sqrt(r2);
 	auto y = sin(phi)*sqrt(r2);
+
+	return glm::vec3(x, y, z);
+}
+
+/**
+ * @brief 生成指向球体的随机方向。
+ */
+inline glm::vec3 random_to_sphere(double radius, double distance_squared) {
+	auto r1 = random_double();
+	auto r2 = random_double();
+	auto z = 1 + r2*(sqrt(1-radius*radius/distance_squared) - 1);
+
+	auto phi = 2*pi*r1;
+	auto x = cos(phi)*sqrt(1-z*z);
+	auto y = sin(phi)*sqrt(1-z*z);
 
 	return glm::vec3(x, y, z);
 }

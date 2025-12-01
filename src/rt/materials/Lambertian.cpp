@@ -6,7 +6,6 @@ namespace rt {
 bool Lambertian::scatter(
 	const Ray& r_in, const HitRecord& rec, ScatterRecord& srec
 ) const {
-	srec.is_specular = false;
 	srec.attenuation = albedo;
 	srec.pdf_ptr = std::make_shared<CosinePDF>(rec.normal);
 	return true;

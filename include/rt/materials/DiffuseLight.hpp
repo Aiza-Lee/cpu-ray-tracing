@@ -9,11 +9,19 @@ namespace rt {
 class DiffuseLight : public Material {
 public:
 	/**
-	 * @brief Construct a new Diffuse Light material.
+	 * @brief  构造一个新的扩散光材质对象。
 	 * 
 	 * @param c 发光的颜色。
 	 */
 	DiffuseLight(const glm::vec3& c) : emit(c) {}
+
+	/**
+	 * @brief 构造一个新的扩散光材质对象。
+	 * 
+	 * @param c 发光的颜色。
+	 * @param intensity 发光强度。
+	 */
+	DiffuseLight(const glm::vec3& c, double intensity) : emit(c * (float)intensity) {}
 
 	virtual bool scatter(
 		const Ray& r_in, const HitRecord& rec, ScatterRecord& srec
@@ -27,6 +35,12 @@ public:
 	) const override {
 		// 直接返回发光颜色
 		return emit;
+	}
+
+	virtual glm::vec3 brdf(
+		const Ray& r_in, const HitRecord& rec, const Ray& scattered
+	) const override {
+		return glm::vec3(0,0,0);
 	}
 
 public:

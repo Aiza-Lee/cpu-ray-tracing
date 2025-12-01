@@ -1,6 +1,8 @@
 #include "rt/SoftTracer.hpp"
 #include "rt/materials/Material.hpp"
 #include "rt/core/Utils.hpp"
+#include "rt/pdf/HittablePDF.hpp"
+#include "rt/pdf/MixturePDF.hpp"
 #include <iostream>
 #include <fmt/core.h>
 #include <omp.h>
@@ -14,7 +16,7 @@ namespace rt {
 SoftTracer::SoftTracer(int width, int height, int samples, int depth)
 	: m_image_width(width), m_image_height(height), m_samples_per_pixel(samples), m_max_depth(depth) {}
 
-glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
+glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::shared_ptr<Hittable>& lights, int depth) {
 	HitRecord hit_rec;
 
 	// 如果递归深度耗尽，返回黑色
@@ -39,8 +41,8 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
 		return hit_rec.mat_ptr->emitted(r, hit_rec);
 
 	// 镜面反射，直接递归追踪反射光线
-	if (srec.is_specular)
-		return srec.attenuation * m_ray_color(srec.specular_ray, world, depth-1);
+	// if (srec.is_specular)
+	// 	return srec.attenuation * m_ray_color(srec.specular_ray, world, lights, depth-1);
 
 	auto pdf_ptr = srec.pdf_ptr;    // 散射方向分布
 	auto mat_ptr = hit_rec.mat_ptr; // 击中物体的材质
@@ -56,8 +58,42 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
 		rr_factor = 1.0f / p;
 	}
 	
-	Ray scatter_ray{ hit_rec.p, pdf_ptr->generate() };      // 散射光线
-	auto pdf_val = pdf_ptr->value(scatter_ray.direction()); // 光线方向的 PDF 值
+	std::shared_ptr<PDF> final_pdf_ptr = pdf_ptr;
+	
+	// 检查光源是否有效
+	bool has_lights = false;
+	if (lights) {
+		auto scene_ptr = std::dynamic_pointer_cast<Scene>(lights);
+		if (scene_ptr) {
+			if (!scene_ptr->objects.empty()) has_lights = true;
+		} else {
+			// 不是 Scene 类型（可能是单个 Hittable），认为有效
+			has_lights = true;
+		}
+	}
+
+	if (has_lights) {
+		auto light_pdf_ptr = make_shared<HittablePDF>(lights, hit_rec.p);
+		
+		switch (m_strategy) {
+			case SamplingStrategy::MIS:
+				final_pdf_ptr = make_shared<MixturePDF>(light_pdf_ptr, pdf_ptr);
+				break;
+			case SamplingStrategy::Light:
+				final_pdf_ptr = light_pdf_ptr;
+				break;
+			case SamplingStrategy::Material:
+			default:
+				final_pdf_ptr = pdf_ptr;
+				break;
+		}
+	} else {
+		// 如果没有光源，强制使用材质采样
+		final_pdf_ptr = pdf_ptr;
+	}
+
+	Ray scatter_ray{ hit_rec.p, final_pdf_ptr->generate() };      // 散射光线
+	auto pdf_val = final_pdf_ptr->value(scatter_ray.direction()); // 光线方向的 PDF 值
 	// 如果 PDF 值为零，说明该方向不可达，返回自发光颜色
 	if (pdf_val <= 0) return mat_ptr->emitted(r, hit_rec);
 
@@ -68,7 +104,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, int depth) {
 	auto cos_theta = glm::dot(hit_rec.normal, glm::normalize(scatter_ray.direction()));
 	if (cos_theta < 0) cos_theta = 0;
 
-	glm::vec3 L_i = m_ray_color(scatter_ray, world, depth-1);
+	glm::vec3 L_i = m_ray_color(scatter_ray, world, lights, depth-1);
 	
 	// 渲染方程的蒙特卡洛估计：
 	// Lr = Emitted + (BRDF * Li * CosTheta) / PDF
@@ -92,7 +128,7 @@ void SoftTracer::m_write_color(std::vector<unsigned char>& image_data, int index
 	image_data[index+2] = static_cast<unsigned char>(256 * std::clamp(b, 0.0f, 0.999f));
 }
 
-void SoftTracer::render(const Scene& scene, const Camera& cam, const std::string& filename) {
+void SoftTracer::render(const Scene& scene, const std::shared_ptr<Hittable>& lights, const Camera& cam, const std::string& filename) {
 	std::vector<unsigned char> image_data(m_image_width * m_image_height * 3);
 
 	std::atomic<int> scanlines_finished = 0;
@@ -110,7 +146,7 @@ void SoftTracer::render(const Scene& scene, const Camera& cam, const std::string
 				auto u = (i + random_double()) / (m_image_width-1);
 				auto v = (j + random_double()) / (m_image_height-1);
 				Ray r = cam.get_ray(u, v);
-				pixel_color += m_ray_color(r, scene, m_max_depth);
+				pixel_color += m_ray_color(r, scene, lights, m_max_depth);
 			}
 			
 			pixel_color = pixel_color / static_cast<float>(m_samples_per_pixel);

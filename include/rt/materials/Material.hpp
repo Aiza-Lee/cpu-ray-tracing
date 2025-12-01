@@ -7,8 +7,6 @@
 namespace rt {
 
 struct ScatterRecord {
-	Ray specular_ray;             ///< 镜面反射光线（如果有的话）。
-	bool is_specular;             ///< 是否为镜面反射。
 	glm::vec3 attenuation;        ///< 衰减系数（颜色）。
 	std::shared_ptr<PDF> pdf_ptr; ///< 概率密度函数指针。
 };
@@ -33,9 +31,7 @@ public:
 	 */
 	virtual bool scatter(
 		const Ray& r_in, const HitRecord& rec, ScatterRecord& srec
-	) const {
-		return false;
-	}
+	) const = 0;
 
 	/**
 	 * @brief 计算双向反射分布函数 (BRDF) 值。
@@ -47,9 +43,7 @@ public:
 	 */
 	virtual glm::vec3 brdf(
 		const Ray& r_in, const HitRecord& rec, const Ray& scattered
-	) const {
-		return glm::vec3(0,0,0);
-	}
+	) const = 0;
 
 	/**
 	 * @brief 获取材质的自发光颜色。
@@ -58,11 +52,7 @@ public:
 	 * @param rec 击中记录。
 	 * @return glm::vec3 自发光颜色。
 	 */
-	virtual glm::vec3 emitted(
-		const Ray& r_in, const HitRecord& rec
-	) const {
-		return glm::vec3(0,0,0);
-	}
+	virtual glm::vec3 emitted(const Ray& r_in, const HitRecord& rec) const = 0;
 };
 
 } // namespace rt

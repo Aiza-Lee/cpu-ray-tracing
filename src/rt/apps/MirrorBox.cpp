@@ -7,8 +7,8 @@ void MirrorBoxApp::run() {
 	const auto aspect_ratio = 1.0;
 	const int image_width = 600;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int samples_per_pixel = 800;
-	const int max_depth = 500;
+	const int samples_per_pixel = 100;
+	const int max_depth = 50;
 
 	Scene world;
 
@@ -37,15 +37,18 @@ void MirrorBoxApp::run() {
 	// XY plane front
 	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(700,0,0), glm::vec3(0,700,0), mirror_mat));
 
-
+	auto light_sphere = std::make_shared<Sphere>(glm::vec3(378, 70, 100), 70, light);
 	world.add(std::make_shared<Sphere>(glm::vec3(278, 100, 278), 100, red));
-	world.add(std::make_shared<Sphere>(glm::vec3(378, 70, 100), 70, light));
+	world.add(light_sphere);
 	world.add(std::make_shared<Sphere>(glm::vec3(350, 350, 350), 80, perfect_mirror_mat));
+
+	auto lights = std::make_shared<Scene>();
+	lights->add(light_sphere);
 
 	Camera cam(glm::vec3(10, 250, 40), glm::vec3(278, 278, 100), glm::vec3(0,1,0), 40, aspect_ratio);
 
 	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
 	tracer.set_background(glm::vec3(0,0,0), false);
-	tracer.render(world, cam, "mirror_box.png");
+	tracer.render(world, lights, cam, "mirror_box.png");
 }
 } // namespace rt

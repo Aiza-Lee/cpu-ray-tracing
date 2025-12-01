@@ -1,4 +1,5 @@
 #include "rt/hittables/Quad.hpp"
+#include "rt/core/Utils.hpp"
 #include <cmath>
 
 namespace rt {
@@ -33,6 +34,22 @@ bool Quad::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const {
 	rec.v = beta;
 
 	return true;
+}
+
+double Quad::pdf_value(const glm::vec3& origin, const glm::vec3& v) const {
+	HitRecord rec;
+	if (!this->hit(Ray(origin, v), 0.001, infinity, rec))
+		return 0;
+
+	auto distance_squared = rec.t * rec.t * glm::length2(v);
+	auto cosine = fabs(glm::dot(v, rec.normal) / glm::length(v));
+
+	return distance_squared / (cosine * area);
+}
+
+glm::vec3 Quad::random(const glm::vec3& origin) const {
+	auto p = Q + (static_cast<float>(random_double()) * u) + (static_cast<float>(random_double()) * v);
+	return p - origin;
 }
 
 } // namespace rt

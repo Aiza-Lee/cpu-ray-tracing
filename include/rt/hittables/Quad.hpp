@@ -23,6 +23,9 @@ public:
 
 	virtual bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const override;
 
+	virtual double pdf_value(const glm::vec3& origin, const glm::vec3& v) const override;
+	virtual glm::vec3 random(const glm::vec3& origin) const override;
+
 public:
 	glm::vec3 Q;                        ///< 角点
 	glm::vec3 u;                        ///< 边向量 u

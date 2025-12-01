@@ -20,6 +20,14 @@ public:
 		const Ray& r_in, const HitRecord& rec, ScatterRecord& srec
 	) const override;
 
+	virtual glm::vec3 brdf(
+		const Ray& r_in, const HitRecord& rec, const Ray& scattered
+	) const override;
+
+	virtual glm::vec3 emitted(const Ray& r_in, const HitRecord& rec) const override {
+		return glm::vec3(0,0,0);
+	}
+
 public:
 	glm::vec3 albedo; ///< 材质的反照率（颜色）。
 	double fuzz;      ///< 模糊度参数，用于模糊反射。

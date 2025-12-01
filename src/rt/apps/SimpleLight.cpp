@@ -23,9 +23,15 @@ void SimpleLightApp::run() {
 
 	auto difflight = std::make_shared<DiffuseLight>(glm::vec3(4, 4, 4)); // Bright light
 	// Light source: a small sphere above
-	world.add(std::make_shared<Sphere>(glm::vec3(0, 7, 0), 2, difflight));
+	auto light_sphere = std::make_shared<Sphere>(glm::vec3(0, 7, 0), 2, difflight);
+	world.add(light_sphere);
 	// And a rect light
-	world.add(std::make_shared<Quad>(glm::vec3(3, 1, -2), glm::vec3(2, 0, 0), glm::vec3(0, 2, 0), difflight));
+	auto light_rect = std::make_shared<Quad>(glm::vec3(3, 1, -2), glm::vec3(2, 0, 0), glm::vec3(0, 2, 0), difflight);
+	world.add(light_rect);
+
+	auto lights = std::make_shared<Scene>();
+	lights->add(light_sphere);
+	lights->add(light_rect);
 
 	// Camera
 	Camera cam(glm::vec3(26,3,6), glm::vec3(0,2,0), glm::vec3(0,1,0), 20, aspect_ratio);
@@ -33,6 +39,6 @@ void SimpleLightApp::run() {
 	// Render
 	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
 	tracer.set_background(glm::vec3(0,0,0), false); // Black background
-	tracer.render(world, cam, "simple_light.png");
+	tracer.render(world, lights, cam, "simple_light.png");
 }
 } // namespace rt
