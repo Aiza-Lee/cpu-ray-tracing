@@ -1,36 +1,0 @@
-Available Applications:
-1. Cornell Box Scene
-2. Mirror Box Scene
-3. Random Spheres Scene
-4. Simple Light Scene
-5. Simple Light Wrong Lambertian Scene
-6. MIS Comparison (MIS vs Light vs Material)
-7. Playground Scene
-Select an application to run (1-7): Available Applications:
-1. Cornell Box Scene
-2. Mirror Box Scene
-3. Random Spheres Scene
-4. Simple Light Scene
-5. Simple Light Wrong Lambertian Scene
-6. MIS Comparison (MIS vs Light vs Material)
-7. Playground Scene
-Select an application to run (1-7): Running Cornell Box Scene...
-Scanlines remaining: 590   Scanlines remaining: 580   Scanlines remaining: 570   Scanlines remaining: 560   Available Applications:
-1. Cornell Box Scene
-2. Mirror Box Scene
-3. Random Spheres Scene
-4. Simple Light Scene
-5. Simple Light Wrong Lambertian Scene
-6. MIS Comparison (MIS vs Light vs Material)
-7. Playground Scene
-Select an application to run (1-7): Running Cornell Box Scene...
-Scanlines remaining: 590   Scanlines remaining: 580   Scanlines remaining: 570   Scanlines remaining: 560   Available Applications:
-1. Cornell Box Scene
-2. Mirror Box Scene
-3. Random Spheres Scene
-4. Simple Light Scene
-5. Simple Light Wrong Lambertian Scene
-6. MIS Comparison (MIS vs Light vs Material)
-7. Playground Scene
-Select an application to run (1-7): Running Cornell Box Scene...
-Scanlines remaining: 590   Scanlines remaining: 570   Scanlines remaining: 580   Scanlines remaining: 560   
