@@ -17,19 +17,22 @@ public:
 	 * 
 	 * @param w 表面法线方向。
 	 */
-	CosinePDF(const glm::vec3& w) { uvw.build_from_w(w); }
+	CosinePDF(const glm::vec3& w) { _uvw.build_from_w(w); }
 
 	virtual double value(const glm::vec3& direction) const override {
-		auto cosine = glm::dot(glm::normalize(direction), uvw.w());
+		auto cosine = glm::dot(glm::normalize(direction), _uvw.w());
 		return (cosine <= 0) ? 0 : cosine / pi;
 	}
 
 	virtual glm::vec3 generate() const override {
-		return uvw.local(random_cosine_direction());
+		auto dbg_mid = random_cosine_direction();
+		assert(dbg_mid.z >= 0);
+		assert(glm::dot(_uvw.transform_to_world(dbg_mid), _uvw.w()) >= 0);
+		return _uvw.transform_to_world(dbg_mid);
 	}
 
-public:
-	ONB uvw;
+private:
+	ONB _uvw;
 };
 
 } // namespace rt

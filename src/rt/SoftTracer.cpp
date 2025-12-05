@@ -75,7 +75,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::s
 	if (has_lights) {
 		auto light_pdf_ptr = make_shared<HittablePDF>(lights, hit_rec.p);
 		
-		switch (m_strategy) {
+		switch (m_strategy) { // 测试使用，用于对比不同采样策略的效果
 			case SamplingStrategy::MIS:
 				final_pdf_ptr = make_shared<MixturePDF>(light_pdf_ptr, scatter_pdf_ptr);
 				break;
@@ -88,7 +88,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::s
 				break;
 		}
 	} else {
-		// 如果没有光源，强制使用材质采样
+		// 如果没有光源，使用材质采样
 		final_pdf_ptr = scatter_pdf_ptr;
 	}
 
@@ -96,7 +96,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::s
 	auto pdf_val = final_pdf_ptr->value(scatter_ray.direction()); // 光线方向的 PDF 值
 	// 如果 PDF 值为零，说明该方向不可达，返回自发光颜色
 	if (pdf_val <= 0) {
-		std::cerr << "Warning: PDF value is zero or negative." << std::endl;
+		fmt::println(stderr, "Warning: PDF value is zero or negative.");
 		return mat_ptr->emitted(r, hit_rec);
 	}
 
@@ -105,7 +105,20 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::s
 
 	// 计算余弦项
 	auto cos_theta = glm::dot(hit_rec.normal, glm::normalize(scatter_ray.direction()));
-	if (cos_theta < 0) cos_theta = 0;
+	if (cos_theta < 0) {
+		fmt::print(stderr, 
+R"(radiance ray: ({},{},{})
+normal: ({},{},{})
+scatter ray: ({},{},{})
+cos_theta: {}
+---------------
+)",			r.direction().x, r.direction().y, r.direction().z, 
+			hit_rec.normal.x, hit_rec.normal.y, hit_rec.normal.z, 
+			scatter_ray.direction().x, scatter_ray.direction().y, scatter_ray.direction().z,
+			cos_theta
+		);
+		cos_theta = 0;
+	}
 
 	glm::vec3 L_i = m_ray_color(scatter_ray, world, lights, depth-1);
 	

@@ -22,13 +22,11 @@ bool Scene::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const 
 double Scene::pdf_value(const glm::vec3& origin, const glm::vec3& v) const {
 	if (objects.empty()) return 0.0;
 
-	auto weight = 1.0 / objects.size();
 	auto sum = 0.0;
+	for (const auto& obj : objects)
+		sum += obj->pdf_value(origin, v);
 
-	for (const auto& object : objects)
-		sum += weight * object->pdf_value(origin, v);
-
-	return sum;
+	return sum / static_cast<double>(objects.size());
 }
 
 glm::vec3 Scene::random(const glm::vec3& origin) const {

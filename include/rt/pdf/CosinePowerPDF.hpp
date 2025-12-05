@@ -21,17 +21,17 @@ public:
 	 * @param w 波瓣的中心方向（通常是反射向量）。
 	 * @param exponent 幂次 n。值越大，波瓣越窄（越光滑）。
 	 */
-	CosinePowerPDF(const glm::vec3& w, double exponent) : exponent(exponent) { 
-		uvw.build_from_w(w); 
+	CosinePowerPDF(const glm::vec3& w, double exponent) : _exponent(exponent) { 
+		_uvw.build_from_w(w); 
 	}
 
 	virtual double value(const glm::vec3& direction) const override {
-		double cosine = glm::dot(glm::normalize(direction), uvw.w());
+		double cosine = glm::dot(glm::normalize(direction), _uvw.w());
 		// 钳位余弦值以防止数值不稳定
 		if (cosine > 1.0) cosine = 1.0;
 		if (cosine <= 0) return 0;
 		
-		return (exponent + 1) / (2 * pi) * pow(cosine, exponent);
+		return (_exponent + 1) / (2 * pi) * pow(cosine, _exponent);
 	}
 
 	virtual glm::vec3 generate() const override {
@@ -42,10 +42,10 @@ public:
 		// 根据分布生成 cos_theta
 		// p(theta) ~ cos^n(theta) -> CDF(theta) = 1 - cos^(n+1)(theta)
 		// cos_theta = (1 - r1)^(1/(n+1)) -> 简化为 r1^(1/(n+1))
-		double cos_theta = pow(r1, 1.0 / (exponent + 1));
+		double cos_theta = pow(r1, 1.0 / (_exponent + 1));
 		double sin_theta = sqrt(std::max(0.0, 1.0 - cos_theta * cos_theta));
 
-		return uvw.local(glm::vec3(
+		return _uvw.transform_to_world(glm::vec3(
 			cos(phi) * sin_theta,
 			sin(phi) * sin_theta,
 			cos_theta
@@ -53,8 +53,8 @@ public:
 	}
 
 private:
-	ONB uvw;
-	double exponent;
+	ONB _uvw;
+	double _exponent;
 };
 
 } // namespace rt
