@@ -7,7 +7,7 @@ void MirrorBoxApp::run() {
 	const auto aspect_ratio = 1.0;
 	const int image_width = 600;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int samples_per_pixel = 100;
+	const int samples_per_pixel = 20;
 	const int max_depth = 50;
 
 	Scene world;
@@ -48,6 +48,7 @@ void MirrorBoxApp::run() {
 	Camera cam(glm::vec3(10, 250, 40), glm::vec3(278, 278, 100), glm::vec3(0,1,0), 40, aspect_ratio);
 
 	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+	tracer.set_sampling_strategy(SamplingStrategy::MIS);
 	tracer.set_background(glm::vec3(0,0,0), false);
 	tracer.render(world, lights, cam, "mirror_box.png");
 }

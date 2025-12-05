@@ -1,7 +1,10 @@
 #pragma once
+
 #include "rt/pdf/PDF.hpp"
 #include "rt/core/ONB.hpp"
 #include "rt/core/Utils.hpp"
+
+#include <fmt/core.h>
 
 namespace rt {
 
@@ -26,8 +29,10 @@ public:
 
 	virtual glm::vec3 generate() const override {
 		auto dbg_mid = random_cosine_direction();
-		assert(dbg_mid.z >= 0);
-		assert(glm::dot(_uvw.transform_to_world(dbg_mid), _uvw.w()) >= 0);
+		auto cosine_theta = glm::dot(glm::normalize(_uvw.transform_to_world(dbg_mid)), _uvw.w());
+		// fmt::println(stderr, 
+		// 	"CosinePDF::generate() - cosine_theta: {}\n  - return ({},{},{})", 
+		// 	cosine_theta, _uvw.transform_to_world(dbg_mid).x, _uvw.transform_to_world(dbg_mid).y, _uvw.transform_to_world(dbg_mid).z);
 		return _uvw.transform_to_world(dbg_mid);
 	}
 

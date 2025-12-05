@@ -59,7 +59,7 @@ glm::vec3 Sphere::random(const glm::vec3& origin) const {
 	uvw.build_from_w(direction);
 	// 使用略小于实际半径的值进行采样，避免生成刚好擦过球体边缘的光线。
 	// 边缘光线容易因浮点误差导致在 pdf_value 的 hit 检测中失败，从而产生黑点。
-	return uvw.transform_to_world(random_to_sphere(0.99 * radius, distance_squared));
+	return uvw.transform_to_world(random_to_sphere(0.9999 * radius, distance_squared));
 }
 
 } // namespace rt
