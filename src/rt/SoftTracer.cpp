@@ -86,6 +86,17 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r_in, const Scene& world, const std
 		n_mat_samples = 1;
 	}
 
+	// 针对镜面反射（Delta分布）的处理：
+	// 镜面反射的 PDF 值为无穷大 (Dirac Delta)。
+	// 在数值上，这意味着材质采样的权重应为 1，而光源采样的权重应为 0。
+	if (srec.is_specular) {
+		n_light_samples = 0;
+		// 如果原本是 MIS，保持材质采样
+		if (m_strategy == SamplingStrategy::MIS) {
+			n_mat_samples = 1;
+		}
+	}
+
 	// 采样任务结构体
 	struct SamplingTask {
 		std::shared_ptr<PDF> pdf; ///< 采样 pdf
@@ -135,7 +146,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r_in, const Scene& world, const std
 	
 	// MIS 启发式函数 (例如 Power Heuristic)
 	auto mis_heuristic = [](double val) {
-		return val * val;
+		return val;
 	};
 
 	// 计算 MIS 权重的辅助函数
