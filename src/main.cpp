@@ -5,6 +5,7 @@
 #include "rt/apps/SimpleLightWrong.hpp"
 #include "rt/apps/MisComparison.hpp"
 #include "rt/apps/Playground.hpp"
+#include "rt/apps/CompareSampling.hpp"
 
 #include <string>
 #include <fmt/core.h>
@@ -13,13 +14,16 @@
 int main(int argc, char* argv[]) {
 	
 	std::vector<std::unique_ptr<rt::Application>> apps;
+	
+	apps.push_back(std::make_unique<rt::CompareSamplingApp>());
+	apps.push_back(std::make_unique<rt::MisComparisonApp>());
+	apps.push_back(std::make_unique<rt::PlaygroundApp>());
+
 	apps.push_back(std::make_unique<rt::CornerBoxApp>());
 	apps.push_back(std::make_unique<rt::MirrorBoxApp>());
 	apps.push_back(std::make_unique<rt::RandomSpheresApp>());
 	apps.push_back(std::make_unique<rt::SimpleLightApp>());
 	apps.push_back(std::make_unique<rt::SimpleLightWrongApp>());
-	apps.push_back(std::make_unique<rt::MisComparisonApp>());
-	apps.push_back(std::make_unique<rt::PlaygroundApp>());
 
 	fmt::print("Available Applications:\n");
 	for (size_t i = 0; i < apps.size(); ++i) {
