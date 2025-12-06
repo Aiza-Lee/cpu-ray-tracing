@@ -7,3 +7,8 @@
 项目使用 vcpkg 作为包管理器。请确保你已经安装并配置好 vcpkg。设置 `VCPKG_ROOT` 环境变量指向 vcpkg 安装路径。
 
 项目使用 CMake 进行构建，提供 Linux 和 Windows 下的 Debug 和 Release 构建预设。
+
+## 渲染结果展示
+
+![Mirror Box Scene](assets/github/mirror_box.png)
+![playground Scene](assets/github/playground_mis.png)

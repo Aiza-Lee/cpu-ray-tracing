@@ -13,7 +13,7 @@ void MisComparisonApp::run() {
 	const auto aspect_ratio = 1.0;
 	const int image_width = 400;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int samples_per_pixel = 40;
+	const int samples_per_pixel = 100;
 	const int max_depth = 70;
 
 	// World
@@ -35,7 +35,7 @@ void MisComparisonApp::run() {
 	auto mirror_3 = std::make_shared<Metal>(glm::vec3(0.95), 0.11); // Very Rough
 
 	// Light Material
-	auto light_mat = std::make_shared<DiffuseLight>(glm::vec3(20, 20, 20));
+	// auto light_mat = std::make_shared<DiffuseLight>(glm::vec3(200, 200, 200));
 
 	auto cam_pos = glm::vec3(0, 250, -500);
 
@@ -63,16 +63,16 @@ void MisComparisonApp::run() {
 	world.add(white_sphere); lights->add(white_sphere);
 	
 	// Light
-	auto light_shape = std::make_shared<Quad>(glm::vec3(-50, 200, -600), glm::vec3(0, 100, 0), glm::vec3(100, 0, 0), light_mat);
-	world.add(light_shape); lights->add(light_shape);
+	// auto light_shape = std::make_shared<Quad>(glm::vec3(-100, 150, -600), glm::vec3(0, 200, 0), glm::vec3(200, 0, 0), light_mat);
+	// world.add(light_shape); lights->add(light_shape);
 
-	// Walls
-	// Back Wall
-	world.add(std::make_shared<Quad>(glm::vec3(-1000, 0, 600), glm::vec3(2000, 0, 0), glm::vec3(0, 1000, 0), gray));
-	// Gound Wall
-	world.add(std::make_shared<Quad>(glm::vec3(-1000, 0, -400), glm::vec3(2000, 0, 0), glm::vec3(0, 0, 1000), gray));
-	// ceiling
-	world.add(std::make_shared<Quad>(glm::vec3(-1000, 1000, 400), glm::vec3(2000, 0, 0), glm::vec3(0, 0, -2500), gray));
+	// // Walls
+	// // Back Wall
+	// world.add(std::make_shared<Quad>(glm::vec3(-1000, 0, 600), glm::vec3(2000, 0, 0), glm::vec3(0, 1000, 0), gray));
+	// // Gound Wall
+	// world.add(std::make_shared<Quad>(glm::vec3(-1000, 0, -400), glm::vec3(2000, 0, 0), glm::vec3(0, 0, 1000), gray));
+	// // ceiling
+	// world.add(std::make_shared<Quad>(glm::vec3(-1000, 1000, 400), glm::vec3(2000, 0, 0), glm::vec3(0, 0, -2500), gray));
 	
 	// Camera
 	Camera cam(cam_pos, glm::vec3(0, 180, 0), glm::vec3(0,1,0), 50, aspect_ratio);
