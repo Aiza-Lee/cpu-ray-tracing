@@ -15,18 +15,18 @@ public:
 	 * 
 	 * @param w 表面法线方向。
 	 */
-	UniformPDF(const glm::vec3& w) { uvw.build_from_w(w); }
+	UniformPDF(const glm::vec3& w) { _uvw.build_from_w(w); }
 
 	virtual double value(const glm::vec3& direction) const override {
 		return 1 / (2 * pi);
 	}
 
 	virtual glm::vec3 generate() const override {
-		return uvw.local(random_unit_vector_hemisphere());
+		return _uvw.transform_to_world(random_unit_vector_hemisphere());
 	}
 
-public:
-	ONB uvw;
+private:
+	ONB _uvw;
 };
 
 } // namespace rt

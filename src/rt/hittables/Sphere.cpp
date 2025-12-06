@@ -14,10 +14,10 @@ static void get_sphere_uv(const glm::vec3& p, double& u, double& v) {
 }
 
 bool Sphere::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const {
-	glm::vec3 oc = r.origin() - center;
-	auto a = glm::length(r.direction()) * glm::length(r.direction());
-	auto half_b = glm::dot(oc, r.direction());
-	auto c = glm::length(oc) * glm::length(oc) - radius * radius;
+	glm::vec3 co = r.origin() - center;
+	auto a = glm::dot(r.direction(), r.direction());
+	auto half_b = glm::dot(co, r.direction());
+	auto c = glm::dot(co, co) - radius * radius;
 
 	auto discriminant = half_b * half_b - a * c;
 	if (discriminant < 0) return false;
@@ -46,8 +46,8 @@ double Sphere::pdf_value(const glm::vec3& origin, const glm::vec3& v) const {
 	if (!this->hit(Ray(origin, v), 0.001, infinity, rec))
 		return 0;
 
-	auto cos_theta_max = sqrt(1 - radius*radius/glm::distance2(center, origin));
-	auto solid_angle = 2*pi*(1-cos_theta_max);
+	auto cos_theta_max = sqrt(1.0 - radius * radius / glm::distance2(center, origin));
+	auto solid_angle = 2.0 * pi * (1.0 - cos_theta_max);
 
 	return  1 / solid_angle;
 }
@@ -59,7 +59,7 @@ glm::vec3 Sphere::random(const glm::vec3& origin) const {
 	uvw.build_from_w(direction);
 	// 使用略小于实际半径的值进行采样，避免生成刚好擦过球体边缘的光线。
 	// 边缘光线容易因浮点误差导致在 pdf_value 的 hit 检测中失败，从而产生黑点。
-	return uvw.local(random_to_sphere(0.99*radius, distance_squared));
+	return uvw.transform_to_world(random_to_sphere(0.9999 * radius, distance_squared));
 }
 
 } // namespace rt

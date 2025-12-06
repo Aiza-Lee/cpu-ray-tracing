@@ -48,10 +48,9 @@ double Quad::pdf_value(const glm::vec3& origin, const glm::vec3& v) const {
 }
 
 glm::vec3 Quad::random(const glm::vec3& origin) const {
-	// 类似于 Sphere 的 0.99 策略，我们在 Quad 内部稍微收缩的区域采样
-	// 范围从 [0, 1] 变为 [0.005, 0.995]，避免边缘浮点误差
-	auto r1 = 0.005 + 0.99 * random_double();
-	auto r2 = 0.005 + 0.99 * random_double();
+	// 范围从 [0, 1] 变为 [0.00005, 0.99995]，避免边缘浮点误差
+	auto r1 = 0.00005 + 0.9999 * random_double();
+	auto r2 = 0.00005 + 0.9999 * random_double();
 	auto p = Q + (static_cast<float>(r1) * u) + (static_cast<float>(r2) * v);
 	return p - origin;
 }

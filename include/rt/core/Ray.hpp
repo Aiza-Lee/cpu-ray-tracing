@@ -11,8 +11,6 @@ namespace rt {
  */
 class Ray {
 public:
-	Ray() {}
-	
 	/**
 	 * @brief 创建一条新的光线。
 	 * 
@@ -44,7 +42,7 @@ public:
 		return _orig + static_cast<float>(t) * _dir;
 	}
 
-public:
+private:
 	glm::vec3 _orig; ///< 光线的起点。
 	glm::vec3 _dir;  ///< 光线的方向。
 };

@@ -8,4 +8,4 @@ out/
 *.o
 *.obj
 vcpkg_installed/
-*.png
+/*.png

@@ -2,7 +2,6 @@
 #include "rt/materials/Material.hpp"
 #include "rt/core/Utils.hpp"
 #include "rt/pdf/HittablePDF.hpp"
-#include "rt/pdf/MixturePDF.hpp"
 #include <iostream>
 #include <fmt/core.h>
 #include <omp.h>
@@ -16,17 +15,15 @@ namespace rt {
 SoftTracer::SoftTracer(int width, int height, int samples, int depth)
 	: m_image_width(width), m_image_height(height), m_samples_per_pixel(samples), m_max_depth(depth) {}
 
-glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::shared_ptr<Hittable>& lights, int depth) {
-	HitRecord hit_rec;
-
+glm::vec3 SoftTracer::m_ray_color(const Ray& r_in, const Scene& world, const std::shared_ptr<Hittable>& lights, int depth) {
 	// 如果递归深度耗尽，返回黑色
-	if (depth <= 0)
-		return glm::vec3(0,0,0);
-
-	if (!world.hit(r, RAY_T_MIN, infinity, hit_rec)) {
+	if (depth <= 0) return glm::vec3(0,0,0);
+	
+	HitRecord hit_rec;
+	if (!world.hit(r_in, RAY_T_MIN, infinity, hit_rec)) {
 		// 如果没有击中任何对象，返回背景色
 		if (m_use_sky_gradient) {
-			glm::vec3 unit_direction = glm::normalize(r.direction());
+			glm::vec3 unit_direction = glm::normalize(r_in.direction());
 			auto t = 0.5 * (unit_direction.y + 1.0);
 			return static_cast<float>(1.0-t)*glm::vec3(1.0, 1.0, 1.0) + static_cast<float>(t)*glm::vec3(0.5, 0.7, 1.0);
 		} else {
@@ -37,12 +34,8 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::s
 	ScatterRecord srec; // 存储散射信息
 
 	// 材质不散射光线，则返回自发光颜色
-	if (!hit_rec.mat_ptr->scatter(r, hit_rec, srec))
-		return hit_rec.mat_ptr->emitted(r, hit_rec);
-
-	// 镜面反射，直接递归追踪反射光线，现在已与 PDF 采样合并
-	// if (srec.is_specular)
-	// 	return srec.attenuation * m_ray_color(srec.specular_ray, world, lights, depth-1);
+	if (!hit_rec.mat_ptr->scatter(r_in, hit_rec, srec) || depth == 1)
+		return hit_rec.mat_ptr->emitted(r_in, hit_rec);
 
 	auto scatter_pdf_ptr = srec.pdf_ptr;    // 散射方向分布
 	auto mat_ptr = hit_rec.mat_ptr; // 击中物体的材质
@@ -53,67 +46,137 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r, const Scene& world, const std::s
 		float p = std::max(srec.attenuation.x, std::max(srec.attenuation.y, srec.attenuation.z));
 		p = std::clamp(p, RR_MIN_PROBABILITY, 1.0f); // 限制最小概率
 		if (random_double() > p)
-			return hit_rec.mat_ptr->emitted(r, hit_rec);
+			return hit_rec.mat_ptr->emitted(r_in, hit_rec);
 		// 能量补偿
 		rr_factor = 1.0f / p;
 	}
 	
-	std::shared_ptr<PDF> final_pdf_ptr = scatter_pdf_ptr;
-	
-	// 检查光源是否有效
-	bool has_lights = false;
+	std::shared_ptr<HittablePDF> light_pdf_ptr = nullptr;
 	if (lights) {
 		auto scene_ptr = std::dynamic_pointer_cast<Scene>(lights);
 		if (scene_ptr) {
-			if (!scene_ptr->objects.empty()) has_lights = true;
+			if (!scene_ptr->objects.empty()) light_pdf_ptr = std::make_shared<HittablePDF>(lights, hit_rec.p);
 		} else {
-			// 不是 Scene 类型（可能是单个 Hittable），认为有效
-			has_lights = true;
+			light_pdf_ptr = std::make_shared<HittablePDF>(lights, hit_rec.p);
 		}
 	}
 
-	if (has_lights) {
-		auto light_pdf_ptr = make_shared<HittablePDF>(lights, hit_rec.p);
-		
-		switch (m_strategy) {
-			case SamplingStrategy::MIS:
-				final_pdf_ptr = make_shared<MixturePDF>(light_pdf_ptr, scatter_pdf_ptr);
-				break;
-			case SamplingStrategy::Light:
-				final_pdf_ptr = light_pdf_ptr;
-				break;
-			case SamplingStrategy::Material:
-			default:
-				final_pdf_ptr = scatter_pdf_ptr;
-				break;
+	int n_light_samples = 0;
+	int n_mat_samples = 0;
+
+	switch (m_strategy) {
+		case SamplingStrategy::MIS:
+			n_light_samples = 1;
+			n_mat_samples = 1;
+			break;
+		case SamplingStrategy::Light:
+			n_light_samples = 1;
+			n_mat_samples = 0;
+			break;
+		case SamplingStrategy::Material:
+		default:
+			n_light_samples = 0;
+			n_mat_samples = 1;
+			break;
+	}
+
+	// 如果没有光源，强制只使用材质采样
+	if (!light_pdf_ptr) {
+		n_light_samples = 0;
+		n_mat_samples = 1;
+	}
+
+	// 针对镜面反射（Delta分布）的处理：
+	// 镜面反射的 PDF 值为无穷大 (Dirac Delta)。
+	// 在数值上，这意味着材质采样的权重应为 1，而光源采样的权重应为 0。
+	if (srec.is_specular) {
+		n_light_samples = 0;
+		// 如果原本是 MIS，保持材质采样
+		if (m_strategy == SamplingStrategy::MIS) {
+			n_mat_samples = 1;
 		}
-	} else {
-		// 如果没有光源，强制使用材质采样
-		final_pdf_ptr = scatter_pdf_ptr;
 	}
 
-	Ray scatter_ray{ hit_rec.p, final_pdf_ptr->generate() };      // 散射光线
-	auto pdf_val = final_pdf_ptr->value(scatter_ray.direction()); // 光线方向的 PDF 值
-	// 如果 PDF 值为零，说明该方向不可达，返回自发光颜色
-	if (pdf_val <= 0) {
-		std::cerr << "Warning: PDF value is zero or negative." << std::endl;
-		return mat_ptr->emitted(r, hit_rec);
+	// 采样任务结构体
+	struct SamplingTask {
+		std::shared_ptr<PDF> pdf; ///< 采样 pdf
+		int num_samples;          ///< 采样数量
+		int next_depth;           ///< 递归深度，对于光源采样为 1, 对于材质采样为 depth - 1
+	};
+	std::vector<SamplingTask> tasks;
+
+	if (n_light_samples > 0 && light_pdf_ptr) {
+		tasks.push_back({light_pdf_ptr, n_light_samples, 1});
 	}
-
-	// 计算 BRDF 值
-	glm::vec3 brdf_val = mat_ptr->brdf(r, hit_rec, scatter_ray);
-
-	// 计算余弦项
-	auto cos_theta = glm::dot(hit_rec.normal, glm::normalize(scatter_ray.direction()));
-	if (cos_theta < 0) cos_theta = 0;
-
-	glm::vec3 L_i = m_ray_color(scatter_ray, world, lights, depth-1);
+	if (n_mat_samples > 0) {
+		tasks.push_back({scatter_pdf_ptr, n_mat_samples, depth - 1});
+	}
 	
-	// 渲染方程的蒙特卡洛估计：
-	// Lr = Emitted + (BRDF * Li * CosTheta) / PDF
-	glm::vec3 L_r = (brdf_val * L_i * (float)cos_theta * rr_factor) / (float)pdf_val;
+	// 采样结果结构体
+	struct SampleResult {
+		glm::vec3 dir;
+		double pdf;
+		glm::vec3 radiance;
+	};
+	std::vector<std::vector<SampleResult>> sample_results(tasks.size());
 
-	return mat_ptr->emitted(r, hit_rec) + L_r;
+	// 1. 生成所有样本并计算 Radiance
+	for (size_t t_idx = 0; t_idx < tasks.size(); ++t_idx) {
+		const auto& task = tasks[t_idx];
+		for (int i = 0; i < task.num_samples; ++i) {
+			auto dir = task.pdf->generate();
+			auto pdf_val = task.pdf->value(dir);
+			
+			if (pdf_val <= 0) continue;
+
+			Ray r_next(hit_rec.p, dir);
+			auto cos_theta = glm::dot(hit_rec.normal, glm::normalize(dir));
+			if (cos_theta <= 0) continue;
+
+			auto Li = m_ray_color(r_next, world, lights, task.next_depth);
+			auto brdf = mat_ptr->brdf(r_in, hit_rec, r_next);
+			
+			if (cos_theta > 0) {
+				// 暂存未加权的贡献: brdf * Li * cos / pdf
+				auto unweighted_contrib = brdf * Li * (float)cos_theta * rr_factor / (float)pdf_val;
+				sample_results[t_idx].push_back({dir, pdf_val, unweighted_contrib});
+			}
+		}
+	}
+	
+	// MIS 启发式函数 (例如 Power Heuristic)
+	auto mis_heuristic = [](double val) {
+		return val;
+	};
+
+	// 计算 MIS 权重的辅助函数
+	auto cal_mis_weight = [&](double cur_pdf, int cur_n_samples, const glm::vec3& dir) {
+		if (tasks.size() <= 1) return 1.0;
+		
+		double sum = 0.0;
+		for (size_t t_idx = 0; t_idx < tasks.size(); ++t_idx) {
+			if (sample_results[t_idx].size() <= 0) continue;
+			double p = tasks[t_idx].pdf->value(dir);
+			sum += mis_heuristic(sample_results[t_idx].size() * p);
+		}
+		return (sum > 0) ? mis_heuristic(cur_n_samples * cur_pdf) / sum : 0.0;
+	};
+	
+	// 2. 计算 MIS 权重并合并结果
+	glm::vec3 L_scatter(0.0f);
+
+	for (size_t t_idx = 0; t_idx < tasks.size(); ++t_idx) {
+		if (sample_results[t_idx].size() <= 0) continue;
+
+		glm::vec3 L_task(0.0f);
+		for (const auto& res : sample_results[t_idx]) {
+			double w = cal_mis_weight(res.pdf, sample_results[t_idx].size(), res.dir);
+			L_task += (float)w * res.radiance;
+		}
+		L_scatter += L_task / (float)sample_results[t_idx].size();
+	}
+
+	return mat_ptr->emitted(r_in, hit_rec) + L_scatter;
 }
 
 void SoftTracer::m_write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color) {

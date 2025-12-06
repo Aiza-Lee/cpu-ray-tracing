@@ -15,6 +15,7 @@ bool Metal::scatter(
 	// 使用 DeltaPDF 避免高指数带来的数值问题
 	if (fuzz < 0.01) {
 		srec.pdf_ptr = std::make_shared<DeltaPDF>(reflected);
+		srec.is_specular = true;
 	} else {
 		// 普通粗糙度
 		double exponent = 2.0 / (fuzz * fuzz) - 2.0;

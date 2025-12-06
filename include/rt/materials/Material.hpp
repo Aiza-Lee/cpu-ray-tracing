@@ -9,6 +9,7 @@ namespace rt {
 struct ScatterRecord {
 	glm::vec3 attenuation;        ///< 衰减系数（颜色）。
 	std::shared_ptr<PDF> pdf_ptr; ///< 概率密度函数指针。
+	bool is_specular = false;     ///< 是否为镜面反射（Delta分布）。
 };
 
 /**

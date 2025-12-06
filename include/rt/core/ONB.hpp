@@ -13,11 +13,11 @@ class ONB {
 public:
 	ONB() {}
 
-	inline glm::vec3 operator[](int i) const { return axis[i]; }
+	inline glm::vec3 operator[](int i) const { return _axis[i]; }
 
-	glm::vec3 u() const { return axis[0]; }
-	glm::vec3 v() const { return axis[1]; }
-	glm::vec3 w() const { return axis[2]; }
+	glm::vec3 u() const { return _axis[0]; }
+	glm::vec3 v() const { return _axis[1]; }
+	glm::vec3 w() const { return _axis[2]; }
 
 	/**
 	 * @brief 将局部坐标系中的向量转换到世界坐标系。
@@ -27,7 +27,7 @@ public:
 	 * @param c 局部坐标 z 分量。
 	 * @return glm::vec3 世界坐标系中的向量。
 	 */
-	glm::vec3 local(double a, double b, double c) const {
+	glm::vec3 transform_to_world(double a, double b, double c) const {
 		return (float)a * u() + (float)b * v() + (float)c * w();
 	}
 
@@ -37,7 +37,7 @@ public:
 	 * @param a 局部坐标向量。
 	 * @return glm::vec3 世界坐标系中的向量。
 	 */
-	glm::vec3 local(const glm::vec3& a) const {
+	glm::vec3 transform_to_world(const glm::vec3& a) const {
 		return a.x * u() + a.y * v() + a.z * w();
 	}
 
@@ -47,14 +47,14 @@ public:
 	 * @param n 法向量（不需要归一化，函数内部会归一化）。
 	 */
 	void build_from_w(const glm::vec3& n) {
-		axis[2] = glm::normalize(n);
+		_axis[2] = glm::normalize(n);
 		glm::vec3 a = (fabs(w().x) > 0.9) ? glm::vec3(0, 1, 0) : glm::vec3(1, 0, 0);
-		axis[1] = glm::normalize(glm::cross(w(), a));
-		axis[0] = glm::cross(w(), v());
+		_axis[1] = glm::normalize(glm::cross(w(), a));
+		_axis[0] = glm::cross(v(), w());
 	}
 
-public:
-	glm::vec3 axis[3];
+private:
+	glm::vec3 _axis[3];
 };
 
 } // namespace rt

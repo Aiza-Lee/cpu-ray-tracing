@@ -70,63 +70,56 @@ inline glm::vec3 random_vec3(double min, double max) {
 }
 
 /**
- * @brief 在单位球体内生成一个随机点。
+ * @brief 生成一个随机的余弦方向向量。
  */
-inline glm::vec3 random_in_unit_sphere() {
-	while (true) {
-		auto p = random_vec3(-1,1);
-		if (glm::length2(p) >= 1) continue;
-		return p;
-	}
+inline glm::vec3 random_cosine_direction() {
+	auto r01 = random_double();
+	auto z = sqrt(1 - r01);
+	
+	auto phi = 2 * pi * random_double();
+	auto x = cos(phi) * sqrt(r01);
+	auto y = sin(phi) * sqrt(r01);
+	
+	return glm::vec3(x, y, z);
 }
 
 /**
- * @brief 生成一个随机单位向量。
+ * @brief 生成一个指向球体表面的随机向量。返回局部坐标下的向量，z轴(0,0,1)指向球心方向。
  */
-inline glm::vec3 random_unit_vector() {
-	return glm::normalize(random_in_unit_sphere());
+inline glm::vec3 random_to_sphere(double radius, double distance_squared) {
+	auto z = random_double(std::sqrt(1 - radius * radius / distance_squared), 1);
+	
+	auto phi = 2 * pi * random_double();
+	auto x = cos(phi) * sqrt(1 - z * z);
+	auto y = sin(phi) * sqrt(1 - z * z);
+	
+	return glm::vec3(x, y, z);
+}
+
+/**
+ * @brief 生成一个均匀分布在单位球体表面的随机向量。
+ */
+inline glm::vec3 random_unit_to_sphere() {
+	auto z = random_double(-1, 1);
+	auto r = std::sqrt(1 - z * z);
+	auto phi = 2 * pi * random_double();
+	return glm::vec3(r * std::cos(phi), r * std::sin(phi), z);
+}
+
+/**
+ * @brief 在单位球体内生成一个随机点。
+ */
+inline glm::vec3 random_in_unit_sphere() {
+	float r = std::cbrt(random_double());
+	return r * random_unit_to_sphere();
 }
 
 /**
  * @brief 生成上半单位球面上的向量
  */
 inline glm::vec3 random_unit_vector_hemisphere() {
-	while (true) {
-		auto p = random_vec3(-1,1);
-		if (glm::length2(p) >= 1) continue;
-		if (p.z < 0) p.z = -p.z;
-		return glm::normalize(p);
-	}
-}
-
-/**
- * @brief 生成一个随机的余弦方向向量。
- */
-inline glm::vec3 random_cosine_direction() {
-	auto r1 = random_double();
-	auto r2 = random_double();
-	auto z = sqrt(1-r2);
-
-	auto phi = 2*pi*r1;
-	auto x = cos(phi)*sqrt(r2);
-	auto y = sin(phi)*sqrt(r2);
-
-	return glm::vec3(x, y, z);
-}
-
-/**
- * @brief 生成指向球体的随机方向。
- */
-inline glm::vec3 random_to_sphere(double radius, double distance_squared) {
-	auto r1 = random_double();
-	auto r2 = random_double();
-	auto z = 1 + r2*(sqrt(1-radius*radius/distance_squared) - 1);
-
-	auto phi = 2*pi*r1;
-	auto x = cos(phi)*sqrt(1-z*z);
-	auto y = sin(phi)*sqrt(1-z*z);
-
-	return glm::vec3(x, y, z);
+	auto on_sphere = random_unit_to_sphere();
+	return on_sphere.z >= 0 ? on_sphere : -on_sphere;
 }
 
 } // namespace rt
