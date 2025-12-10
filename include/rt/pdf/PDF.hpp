@@ -8,7 +8,7 @@ namespace rt {
  */
 class PDF {
 public:
-	virtual ~PDF() {}
+	virtual ~PDF() = default;
 
 	/**
 	 * @brief 计算给定方向的 PDF 值。
@@ -16,14 +16,14 @@ public:
 	 * @param direction 采样方向。
 	 * @return double PDF 值。
 	 */
-	virtual double value(const glm::vec3& direction) const = 0;
+	[[nodiscard]] virtual double value(const glm::vec3& direction) const = 0;
 
 	/**
 	 * @brief 根据 PDF 分布生成一个随机方向。
 	 * 
 	 * @return glm::vec3 生成的随机方向向量。
 	 */
-	virtual glm::vec3 generate() const = 0;
+	[[nodiscard]] virtual glm::vec3 generate() const = 0;
 };
 
 } // namespace rt

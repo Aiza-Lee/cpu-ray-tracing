@@ -35,7 +35,7 @@ public:
 	 * @param t 垂直坐标分数（0 到 1）。
 	 * @return Ray 生成的光线。
 	 */
-	Ray get_ray(double s, double t) const;
+	[[nodiscard]] Ray get_ray(double s, double t) const;
 
 private:
 	glm::vec3 m_origin;            ///< 摄像机原点位置。

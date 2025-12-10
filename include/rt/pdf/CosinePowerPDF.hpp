@@ -35,15 +35,15 @@ public:
 	}
 
 	virtual glm::vec3 generate() const override {
-		double r1 = random_double();
-		double r2 = random_double();
-		double phi = 2 * pi * r2;
+		const double r1 = random_double();
+		const double r2 = random_double();
+		const double phi = 2 * pi * r2;
 		
 		// 根据分布生成 cos_theta
 		// p(theta) ~ cos^n(theta) -> CDF(theta) = 1 - cos^(n+1)(theta)
 		// cos_theta = (1 - r1)^(1/(n+1)) -> 简化为 r1^(1/(n+1))
-		double cos_theta = pow(r1, 1.0 / (_exponent + 1));
-		double sin_theta = sqrt(std::max(0.0, 1.0 - cos_theta * cos_theta));
+		const double cos_theta = pow(r1, 1.0 / (_exponent + 1));
+		const double sin_theta = sqrt(std::max(0.0, 1.0 - cos_theta * cos_theta));
 
 		return _uvw.transform_to_world(glm::vec3(
 			cos(phi) * sin_theta,

@@ -42,7 +42,7 @@ public:
 	 * @param scattered 散射光线。
 	 * @return glm::vec3 BRDF 值。
 	 */
-	virtual glm::vec3 brdf(
+	[[nodiscard]] virtual glm::vec3 brdf(
 		const Ray& r_in, const HitRecord& rec, const Ray& scattered
 	) const = 0;
 
@@ -53,7 +53,7 @@ public:
 	 * @param rec 击中记录。
 	 * @return glm::vec3 自发光颜色。
 	 */
-	virtual glm::vec3 emitted(const Ray& r_in, const HitRecord& rec) const = 0;
+	[[nodiscard]] virtual glm::vec3 emitted(const Ray& r_in, const HitRecord& rec) const = 0;
 };
 
 } // namespace rt

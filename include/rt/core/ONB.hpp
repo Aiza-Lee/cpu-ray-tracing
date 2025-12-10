@@ -13,7 +13,7 @@ class ONB {
 public:
 	ONB() {}
 
-	inline glm::vec3 operator[](int i) const { return _axis[i]; }
+	glm::vec3 operator[](const int i) const { return _axis[i]; }
 
 	glm::vec3 u() const { return _axis[0]; }
 	glm::vec3 v() const { return _axis[1]; }
@@ -27,7 +27,7 @@ public:
 	 * @param c 局部坐标 z 分量。
 	 * @return glm::vec3 世界坐标系中的向量。
 	 */
-	glm::vec3 transform_to_world(double a, double b, double c) const {
+	glm::vec3 transform_to_world(const double a, const double b, const double c) const {
 		return (float)a * u() + (float)b * v() + (float)c * w();
 	}
 

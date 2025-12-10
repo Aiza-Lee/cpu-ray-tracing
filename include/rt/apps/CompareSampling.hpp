@@ -6,9 +6,9 @@ namespace rt {
 
 class CompareSamplingApp : public Application {
 public:
-	virtual ~CompareSamplingApp() = default;
-	virtual void run() override;
-	virtual std::string name() const override { return "CompareSampling Scene"; }
+	~CompareSamplingApp() override = default;
+	void run() override;
+	std::string name() const override { return "CompareSampling Scene"; }
 };
 
 } // namespace rt

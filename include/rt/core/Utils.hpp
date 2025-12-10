@@ -22,7 +22,7 @@ const double pi = glm::pi<double>();
  * @param degrees 角度值。
  * @return double 弧度值。
  */
-inline double degrees_to_radians(double degrees) {
+inline double degrees_to_radians(const double degrees) {
 	return degrees * pi / 180.0;
 }
 
@@ -32,8 +32,8 @@ inline double degrees_to_radians(double degrees) {
  * @return double 随机数。
  */
 inline double random_double() {
-	static thread_local std::uniform_real_distribution<double> distribution(0.0, 1.0);
-	static thread_local std::mt19937 generator(std::random_device{}());
+	thread_local std::uniform_real_distribution<double> distribution(0.0, 1.0);
+	thread_local std::mt19937 generator(std::random_device{}());
 	return distribution(generator);
 }
 
@@ -44,11 +44,11 @@ inline double random_double() {
  * @param max 最大值。
  * @return double 随机数。
  */
-inline double random_double(double min, double max) {
+inline double random_double(const double min, const double max) {
 	return min + (max - min) * random_double();
 }
 
-inline int random_int(int min, int max) {
+inline int random_int(const int min, const int max) {
 	return static_cast<int>(random_double(min, max + 1));
 }
 
@@ -65,7 +65,7 @@ inline glm::vec3 random_vec3() {
  * @param min 最小值。
  * @param max 最大值。
  */
-inline glm::vec3 random_vec3(double min, double max) {
+inline glm::vec3 random_vec3(const double min, const double max) {
 	return glm::vec3(random_double(min,max), random_double(min,max), random_double(min,max));
 }
 
@@ -86,7 +86,7 @@ inline glm::vec3 random_cosine_direction() {
 /**
  * @brief 生成一个指向球体表面的随机向量。返回局部坐标下的向量，z轴(0,0,1)指向球心方向。
  */
-inline glm::vec3 random_to_sphere(double radius, double distance_squared) {
+inline glm::vec3 random_to_sphere(const double radius, const double distance_squared) {
 	auto z = random_double(std::sqrt(1 - radius * radius / distance_squared), 1);
 	
 	auto phi = 2 * pi * random_double();

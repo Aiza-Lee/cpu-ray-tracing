@@ -6,11 +6,11 @@ void RandomSpheresApp::run() {
 	std::cout << "Running Random Spheres Scene..." << std::endl;
 
 	// Image
-	const auto aspect_ratio = 16.0 / 9.0;
-	const int image_width = 400;
-	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int samples_per_pixel = 100;
-	const int max_depth = 50;
+	constexpr auto aspect_ratio = 16.0 / 9.0;
+	constexpr int image_width = 400;
+	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
+	constexpr int samples_per_pixel = 100;
+	constexpr int max_depth = 50;
 
 	// World
 	Scene world;

@@ -22,13 +22,13 @@ public:
 	 */
 	CosinePDF(const glm::vec3& w) { _uvw.build_from_w(w); }
 
-	virtual double value(const glm::vec3& direction) const override {
-		auto cosine = glm::dot(glm::normalize(direction), _uvw.w());
+	[[nodiscard]] double value(const glm::vec3& direction) const override {
+		const auto cosine = glm::dot(glm::normalize(direction), _uvw.w());
 		return (cosine <= 0) ? 0 : cosine / pi;
 	}
 
-	virtual glm::vec3 generate() const override {
-		auto dbg_mid = random_cosine_direction();
+	[[nodiscard]] glm::vec3 generate() const override {
+		const auto dbg_mid = random_cosine_direction();
 		auto cosine_theta = glm::dot(glm::normalize(_uvw.transform_to_world(dbg_mid)), _uvw.w());
 		// fmt::println(stderr, 
 		// 	"CosinePDF::generate() - cosine_theta: {}\n  - return ({},{},{})", 

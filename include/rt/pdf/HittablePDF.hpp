@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "rt/pdf/PDF.hpp"
 #include "rt/hittables/Hittable.hpp"
 
@@ -7,13 +9,13 @@ namespace rt {
 
 class HittablePDF : public PDF {
 public:
-	HittablePDF(std::shared_ptr<Hittable> p, const glm::vec3& origin) : _hittable_ptr(p), _origin(origin) {}
+	HittablePDF(std::shared_ptr<Hittable> p, const glm::vec3& origin) : _origin(origin), _hittable_ptr(std::move(p)) {}
 
-	virtual double value(const glm::vec3& direction) const override {
+	[[nodiscard]] double value(const glm::vec3& direction) const override {
 		return _hittable_ptr->pdf_value(_origin, direction);
 	}
 
-	virtual glm::vec3 generate() const override {
+	[[nodiscard]] glm::vec3 generate() const override {
 		return _hittable_ptr->random(_origin);
 	}
 

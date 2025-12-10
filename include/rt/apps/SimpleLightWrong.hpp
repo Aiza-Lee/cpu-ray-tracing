@@ -6,9 +6,9 @@ namespace rt {
 
 class SimpleLightWrongApp : public Application {
 public:
-	virtual ~SimpleLightWrongApp() = default;
-	virtual void run() override;
-	virtual std::string name() const override { return "Simple Light Wrong Lambertian Scene"; }
+	~SimpleLightWrongApp() override = default;
+	void run() override;
+	std::string name() const override { return "Simple Light Wrong Lambertian Scene"; }
 };
 
 } // namespace rt

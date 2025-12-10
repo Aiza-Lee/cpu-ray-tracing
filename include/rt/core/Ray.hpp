@@ -24,13 +24,13 @@ public:
 	 * @brief 获取光线的起点。
 	 * @return glm::vec3 起点。
 	 */
-	glm::vec3 origin() const { return _orig; }
+	[[nodiscard]] glm::vec3 origin() const { return _orig; }
 
 	/**
 	 * @brief 获取光线的方向。
 	 * @return glm::vec3 方向。
 	 */
-	glm::vec3 direction() const { return _dir; }
+	[[nodiscard]] glm::vec3 direction() const { return _dir; }
 
 	/**
 	 * @brief 计算光线在参数 t 处的点。
@@ -38,7 +38,7 @@ public:
 	 * @param t 参数。
 	 * @return glm::vec3 点 P(t)。
 	 */
-	glm::vec3 at(double t) const {
+	[[nodiscard]] glm::vec3 at(const double t) const {
 		return _orig + static_cast<float>(t) * _dir;
 	}
 

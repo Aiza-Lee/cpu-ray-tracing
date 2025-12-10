@@ -23,24 +23,24 @@ public:
 	 */
 	DiffuseLight(const glm::vec3& c, double intensity) : emit(c * (float)intensity) {}
 
-	virtual bool scatter(
+	bool scatter(
 		const Ray& r_in, const HitRecord& rec, ScatterRecord& srec
 	) const override {
 		// 发光体不散射光线
 		return false;
 	}
 
-	virtual glm::vec3 emitted(
+	[[nodiscard]] glm::vec3 emitted(
 		const Ray& r_in, const HitRecord& rec
 	) const override {
 		// 直接返回发光颜色
 		return emit;
 	}
 
-	virtual glm::vec3 brdf(
+	[[nodiscard]] glm::vec3 brdf(
 		const Ray& r_in, const HitRecord& rec, const Ray& scattered
 	) const override {
-		return glm::vec3(0,0,0);
+		return {0,0,0};
 	}
 
 public:

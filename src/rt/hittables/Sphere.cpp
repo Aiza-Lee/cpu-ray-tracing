@@ -6,22 +6,22 @@
 namespace rt {
 
 static void get_sphere_uv(const glm::vec3& p, double& u, double& v) {
-	auto theta = acos(-p.y);
-	auto phi = atan2(-p.z, p.x) + pi;
+	const auto theta = acos(-p.y);
+	const auto phi = atan2(-p.z, p.x) + pi;
 
 	u = phi / (2 * pi);
 	v = theta / pi;
 }
 
-bool Sphere::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const {
-	glm::vec3 co = r.origin() - center;
-	auto a = glm::dot(r.direction(), r.direction());
-	auto half_b = glm::dot(co, r.direction());
-	auto c = glm::dot(co, co) - radius * radius;
+bool Sphere::hit(const Ray& r, const double t_min, const double t_max, HitRecord& rec) const {
+	const glm::vec3 co = r.origin() - center;
+	const auto a = glm::dot(r.direction(), r.direction());
+	const auto half_b = glm::dot(co, r.direction());
+	const auto c = glm::dot(co, co) - radius * radius;
 
-	auto discriminant = half_b * half_b - a * c;
+	const auto discriminant = half_b * half_b - a * c;
 	if (discriminant < 0) return false;
-	auto sqrtd = std::sqrt(discriminant);
+	const auto sqrtd = std::sqrt(discriminant);
 
 	// 找到最近的根，在 t_min 和 t_max 范围内
 	auto root = (-half_b - sqrtd) / a;
@@ -33,7 +33,7 @@ bool Sphere::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const
 
 	rec.t = root;
 	rec.p = r.at(rec.t);
-	glm::vec3 outward_normal = (rec.p - center) / static_cast<float>(radius);
+	const glm::vec3 outward_normal = (rec.p - center) / static_cast<float>(radius);
 	rec.set_face_normal(r, outward_normal);
 	get_sphere_uv(outward_normal, rec.u, rec.v);
 	rec.mat_ptr = mat_ptr;
@@ -42,19 +42,18 @@ bool Sphere::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const
 }
 
 double Sphere::pdf_value(const glm::vec3& origin, const glm::vec3& v) const {
-	HitRecord rec;
-	if (!this->hit(Ray(origin, v), 0.001, infinity, rec))
+	if (HitRecord rec; !this->hit(Ray(origin, v), 0.001, infinity, rec))
 		return 0;
 
-	auto cos_theta_max = sqrt(1.0 - radius * radius / glm::distance2(center, origin));
-	auto solid_angle = 2.0 * pi * (1.0 - cos_theta_max);
+	const auto cos_theta_max = sqrt(1.0 - radius * radius / glm::distance2(center, origin));
+	const auto solid_angle = 2.0 * pi * (1.0 - cos_theta_max);
 
 	return  1 / solid_angle;
 }
 
 glm::vec3 Sphere::random(const glm::vec3& origin) const {
-	glm::vec3 direction = center - origin;
-	auto distance_squared = glm::length2(direction);
+	const glm::vec3 direction = center - origin;
+	const auto distance_squared = glm::length2(direction);
 	ONB uvw;
 	uvw.build_from_w(direction);
 	// 使用略小于实际半径的值进行采样，避免生成刚好擦过球体边缘的光线。

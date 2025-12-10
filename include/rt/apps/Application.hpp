@@ -23,7 +23,7 @@ class Application {
 public:
 	virtual ~Application() = default;
 	virtual void run() = 0;
-	virtual std::string name() const = 0;
+	[[nodiscard]] virtual std::string name() const = 0;
 };
 
 } // namespace rt

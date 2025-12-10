@@ -4,11 +4,11 @@
 namespace rt {
 void MirrorBoxApp::run() {
 	std::cout << "Running Mirror Box Scene..." << std::endl;
-	const auto aspect_ratio = 1.0;
-	const int image_width = 1024;
-	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int samples_per_pixel = 6000;
-	const int max_depth = 400;
+	constexpr auto aspect_ratio = 1.0;
+	constexpr int image_width = 1024;
+	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
+	constexpr int samples_per_pixel = 6000;
+	constexpr int max_depth = 400;
 
 	Scene world;
 

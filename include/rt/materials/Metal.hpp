@@ -14,18 +14,18 @@ public:
 	 * @param a 材质的反照率（颜色）。
 	 * @param f 模糊度参数（0 表示完美镜面，1 表示非常模糊）。
 	 */
-	Metal(const glm::vec3& a, double f) : albedo(a), fuzz(f < 1 ? f : 1) {}
+	Metal(const glm::vec3& a, const double f) : albedo(a), fuzz(f < 1 ? f : 1) {}
 
-	virtual bool scatter(
+	bool scatter(
 		const Ray& r_in, const HitRecord& rec, ScatterRecord& srec
 	) const override;
 
-	virtual glm::vec3 brdf(
+	[[nodiscard]] glm::vec3 brdf(
 		const Ray& r_in, const HitRecord& rec, const Ray& scattered
 	) const override;
 
-	virtual glm::vec3 emitted(const Ray& r_in, const HitRecord& rec) const override {
-		return glm::vec3(0,0,0);
+	[[nodiscard]] glm::vec3 emitted(const Ray& r_in, const HitRecord& rec) const override {
+		return {0,0,0};
 	}
 
 public:

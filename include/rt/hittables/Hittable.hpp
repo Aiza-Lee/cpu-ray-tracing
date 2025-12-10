@@ -30,14 +30,14 @@ public:
 	 * @param origin 采样的原点。
 	 * @param v 采样方向。
 	 */
-	virtual double pdf_value(const glm::vec3& origin, const glm::vec3& v) const = 0;
+	[[nodiscard]] virtual double pdf_value(const glm::vec3& origin, const glm::vec3& v) const = 0;
 
 	/**
 	 * @brief 从给定的原点产生指向该对象的随机方向。
 	 * 
 	 * @param origin 采样的原点。
 	 */
-	virtual glm::vec3 random(const glm::vec3& origin) const = 0;
+	[[nodiscard]] virtual glm::vec3 random(const glm::vec3& origin) const = 0;
 };
 
 } // namespace rt

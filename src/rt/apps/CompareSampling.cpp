@@ -5,11 +5,11 @@ void rt::CompareSamplingApp::run() {
 	fmt::println("Running CompareSampling...");
 
 	// Image
-	const auto aspect_ratio = 1.0;
-	const int image_width = 600;
-	const int image_height = static_cast<int>(image_width / aspect_ratio);
-		
-	const int max_depth = 70;
+	constexpr auto aspect_ratio = 1.0;
+	constexpr int image_width = 600;
+	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
+
+	constexpr int max_depth = 70;
 
 	// World
 	Scene world;
@@ -48,7 +48,7 @@ void rt::CompareSamplingApp::run() {
 	// 16
 	{
 		fmt::println("16 Samples per Pixel - Material Sampling Only...");
-		const int samples_per_pixel = 16; 
+		constexpr int samples_per_pixel = 16; 
 		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
 		tracer.set_background(glm::vec3(0,0,0), false);
 		tracer.set_sampling_strategy(SamplingStrategy::Material);
@@ -57,7 +57,7 @@ void rt::CompareSamplingApp::run() {
 	// 50
 	{
 		fmt::println("50 Samples per Pixel - Material Sampling Only...");
-		const int samples_per_pixel = 50; 
+		constexpr int samples_per_pixel = 50; 
 		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
 		tracer.set_background(glm::vec3(0,0,0), false);
 		tracer.set_sampling_strategy(SamplingStrategy::Material);
@@ -67,7 +67,7 @@ void rt::CompareSamplingApp::run() {
 	// 100
 	{
 		fmt::println("100 Samples per Pixel - Material Sampling Only...");
-		const int samples_per_pixel = 100; 
+		constexpr int samples_per_pixel = 100; 
 		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
 		tracer.set_background(glm::vec3(0,0,0), false);
 		tracer.set_sampling_strategy(SamplingStrategy::Material);
@@ -76,7 +76,7 @@ void rt::CompareSamplingApp::run() {
 	// 1000
 	{
 		fmt::println("1000 Samples per Pixel - Material Sampling Only...");
-		const int samples_per_pixel = 1000; 
+		constexpr int samples_per_pixel = 1000; 
 		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
 		tracer.set_background(glm::vec3(0,0,0), false);
 		tracer.set_sampling_strategy(SamplingStrategy::Material);

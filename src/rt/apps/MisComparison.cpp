@@ -10,11 +10,11 @@ void MisComparisonApp::run() {
 	std::cout << "Running MIS Comparison Scene..." << std::endl;
 
 	// Image
-	const auto aspect_ratio = 1.0;
-	const int image_width = 400;
-	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int samples_per_pixel = 100;
-	const int max_depth = 70;
+	constexpr auto aspect_ratio = 1.0;
+	constexpr int image_width = 400;
+	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
+	constexpr int samples_per_pixel = 100;
+	constexpr int max_depth = 70;
 
 	// World
 	Scene world;

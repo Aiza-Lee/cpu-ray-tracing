@@ -3,7 +3,7 @@
 
 namespace rt {
 
-bool Scene::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const {
+bool Scene::hit(const Ray& r, const double t_min, const double t_max, HitRecord& rec) const {
 	HitRecord temp_rec;
 	bool hit_anything = false;
 	auto closest_so_far = t_max;
@@ -30,9 +30,9 @@ double Scene::pdf_value(const glm::vec3& origin, const glm::vec3& v) const {
 }
 
 glm::vec3 Scene::random(const glm::vec3& origin) const {
-	if (objects.empty()) return glm::vec3(1,0,0);
+	if (objects.empty()) return {1,0,0};
 
-	auto int_size = static_cast<int>(objects.size());
+	const auto int_size = static_cast<int>(objects.size());
 	return objects[random_int(0, int_size-1)]->random(origin);
 }
 

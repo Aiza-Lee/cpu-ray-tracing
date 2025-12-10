@@ -6,9 +6,9 @@ namespace rt {
 
 class SimpleLightApp : public Application {
 public:
-	virtual ~SimpleLightApp() = default;
-	virtual void run() override;
-	virtual std::string name() const override { return "Simple Light Scene"; }
+	~SimpleLightApp() override = default;
+	void run() override;
+	std::string name() const override { return "Simple Light Scene"; }
 };
 
 } // namespace rt

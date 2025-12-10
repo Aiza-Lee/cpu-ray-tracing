@@ -12,12 +12,12 @@
 
 namespace rt {
 
-SoftTracer::SoftTracer(int width, int height, int samples, int depth)
+SoftTracer::SoftTracer(const int width, const int height, const int samples, const int depth)
 	: m_image_width(width), m_image_height(height), m_samples_per_pixel(samples), m_max_depth(depth) {}
 
 glm::vec3 SoftTracer::m_ray_color(const Ray& r_in, const Scene& world, const std::shared_ptr<Hittable>& lights, int depth) {
 	// 如果递归深度耗尽，返回黑色
-	if (depth <= 0) return glm::vec3(0,0,0);
+	if (depth <= 0) return {0,0,0};
 	
 	HitRecord hit_rec;
 	if (!world.hit(r_in, RAY_T_MIN, infinity, hit_rec)) {
@@ -26,9 +26,8 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r_in, const Scene& world, const std
 			glm::vec3 unit_direction = glm::normalize(r_in.direction());
 			auto t = 0.5 * (unit_direction.y + 1.0);
 			return static_cast<float>(1.0-t)*glm::vec3(1.0, 1.0, 1.0) + static_cast<float>(t)*glm::vec3(0.5, 0.7, 1.0);
-		} else {
-			return m_background_color;
 		}
+		return m_background_color;
 	}
 
 	ScatterRecord srec; // 存储散射信息
@@ -53,8 +52,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r_in, const Scene& world, const std
 	
 	std::shared_ptr<HittablePDF> light_pdf_ptr = nullptr;
 	if (lights) {
-		auto scene_ptr = std::dynamic_pointer_cast<Scene>(lights);
-		if (scene_ptr) {
+		if (auto scene_ptr = std::dynamic_pointer_cast<Scene>(lights)) {
 			if (!scene_ptr->objects.empty()) light_pdf_ptr = std::make_shared<HittablePDF>(lights, hit_rec.p);
 		} else {
 			light_pdf_ptr = std::make_shared<HittablePDF>(lights, hit_rec.p);
@@ -145,12 +143,12 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r_in, const Scene& world, const std
 	}
 	
 	// MIS 启发式函数 (例如 Power Heuristic)
-	auto mis_heuristic = [](double val) {
+	auto mis_heuristic = [](const double val) {
 		return val;
 	};
 
 	// 计算 MIS 权重的辅助函数
-	auto cal_mis_weight = [&](double cur_pdf, int cur_n_samples, const glm::vec3& dir) {
+	auto cal_mis_weight = [&](const double cur_pdf, const int cur_n_samples, const glm::vec3& dir) {
 		if (tasks.size() <= 1) return 1.0;
 		
 		double sum = 0.0;
@@ -179,7 +177,7 @@ glm::vec3 SoftTracer::m_ray_color(const Ray& r_in, const Scene& world, const std
 	return mat_ptr->emitted(r_in, hit_rec) + L_scatter;
 }
 
-void SoftTracer::m_write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color) {
+void SoftTracer::m_write_color(std::vector<unsigned char>& image_data, const int index, const glm::vec3 pixel_color) {
 	auto r = pixel_color.x;
 	auto g = pixel_color.y;
 	auto b = pixel_color.z;

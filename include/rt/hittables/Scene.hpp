@@ -13,14 +13,14 @@ using std::make_shared;
  */
 class Scene : public Hittable {
 public:
-	Scene() {}
+	Scene() = default;
 	
 	/**
 	 * @brief 使用单个对象构造新的场景对象。
 	 * 
 	 * @param object 指向可被光线击中的对象的指针。
 	 */
-	Scene(shared_ptr<Hittable> object) { add(object); }
+	explicit Scene(const shared_ptr<Hittable>& object) { add(object); }
 
 	/**
 	 * @brief 清空场景中的所有对象。
@@ -32,7 +32,7 @@ public:
 	 * 
 	 * @param object 指向可被光线击中的对象的指针。
 	 */
-	void add(shared_ptr<Hittable> object) { objects.push_back(object); }
+	void add(const shared_ptr<Hittable>& object) { objects.push_back(object); }
 
 	/**
 	 * @brief 判断光线是否击中场景中的任何对象。
@@ -46,12 +46,11 @@ public:
 	 * @return true 如果有任何击中。
 	 * @return false 否则。
 	 */
-	virtual bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const override;
+	bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const override;
 
-	virtual double pdf_value(const glm::vec3& origin, const glm::vec3& v) const override;
-	virtual glm::vec3 random(const glm::vec3& origin) const override;
+	[[nodiscard]] double pdf_value(const glm::vec3& origin, const glm::vec3& v) const override;
+	[[nodiscard]] glm::vec3 random(const glm::vec3& origin) const override;
 
-public:
 	std::vector<shared_ptr<Hittable>> objects; ///< 场景中的对象列表。
 };
 

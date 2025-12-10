@@ -10,6 +10,8 @@
 #include <string>
 #include <fmt/core.h>
 #include <iostream>
+#include <vector>
+#include <memory>
 
 int main(int argc, char* argv[]) {
 	

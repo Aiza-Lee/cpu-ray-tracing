@@ -24,7 +24,7 @@ Camera::Camera(
 	m_lower_left_corner = m_origin - m_horizontal/2.0f - m_vertical/2.0f - w;
 }
 
-Ray Camera::get_ray(double s, double t) const {
+Ray Camera::get_ray(const double s, const double t) const {
 	return Ray(m_origin, m_lower_left_corner + static_cast<float>(s)*m_horizontal + static_cast<float>(t)*m_vertical - m_origin);
 }
 

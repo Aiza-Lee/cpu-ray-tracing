@@ -15,16 +15,16 @@ public:
 	 */
 	Lambertian(const glm::vec3& a) : albedo(a) {}
 
-	virtual bool scatter(
+	bool scatter(
 		const Ray& r_in, const HitRecord& rec, ScatterRecord& srec
 	) const override;
 
-	virtual glm::vec3 brdf(
+	[[nodiscard]] glm::vec3 brdf(
 		const Ray& r_in, const HitRecord& rec, const Ray& scattered
 	) const override;
 
-	virtual glm::vec3 emitted(const Ray& r_in, const HitRecord& rec) const override {
-		return glm::vec3(0,0,0);
+	[[nodiscard]] glm::vec3 emitted(const Ray& r_in, const HitRecord& rec) const override {
+		return {0,0,0};
 	}
 
 public:

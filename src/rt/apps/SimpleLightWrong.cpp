@@ -6,13 +6,13 @@ void SimpleLightWrongApp::run() {
 	std::cout << "Running Comparison Scene (Cosine vs Uniform)..." << std::endl;
 
 	// Image
-	const auto aspect_ratio = 1.0;
-	const int image_width = 600;
-	const int image_height = static_cast<int>(image_width / aspect_ratio);
+	constexpr auto aspect_ratio = 1.0;
+	constexpr int image_width = 600;
+	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
 		
 	// !!! 关键：使用低采样数来凸显噪声差异 !!!
-	const int samples_per_pixel = 1000; 
-	const int max_depth = 50;
+	constexpr int samples_per_pixel = 1000;
+	constexpr int max_depth = 50;
 
 	// World
 	Scene world;
