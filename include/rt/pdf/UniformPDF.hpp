@@ -12,13 +12,15 @@ class UniformPDF : public PDF {
 public:
 	/**
 	 * @brief 构造函数。
-	 * 
+	 *
 	 * @param w 表面法线方向。
 	 */
-	UniformPDF(const glm::vec3& w) { _uvw.build_from_w(w); }
+	UniformPDF(const glm::vec3& w) {
+		_uvw.build_from_w(w);
+	}
 
-	[[nodiscard]] double value(const glm::vec3& direction) const override {
-		return 1 / (2 * pi);
+	[[nodiscard]] double value(const glm::vec3& /*direction*/) const override {
+		return 1 / (2 * PI);
 	}
 
 	[[nodiscard]] glm::vec3 generate() const override {
@@ -26,7 +28,7 @@ public:
 	}
 
 private:
-	ONB _uvw;
+	ONB _uvw{};
 };
 
 } // namespace rt

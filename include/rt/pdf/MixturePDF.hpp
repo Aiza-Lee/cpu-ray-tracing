@@ -1,4 +1,8 @@
 #pragma once
+#include <array>
+#include <memory>
+#include <utility>
+
 #include "rt/pdf/PDF.hpp"
 #include "rt/core/Utils.hpp"
 
@@ -14,23 +18,23 @@ namespace rt {
 class MixturePDF : public PDF {
 public:
 	MixturePDF(std::shared_ptr<PDF> p0, std::shared_ptr<PDF> p1) {
-		_p[0] = p0;
-		_p[1] = p1;
+		_p[0] = std::move(p0);
+		_p[1] = std::move(p1);
 	}
 
-	virtual double value(const glm::vec3& direction) const override {
+	[[nodiscard]] double value(const glm::vec3& direction) const override {
 		return 0.5 * _p[0]->value(direction) + 0.5 * _p[1]->value(direction);
 	}
 
-	virtual glm::vec3 generate() const override {
-		if (random_double() < 0.5)
+	[[nodiscard]] glm::vec3 generate() const override {
+		if (random_double() < 0.5) {
 			return _p[0]->generate();
-		else
-			return _p[1]->generate();
+		}
+		return _p[1]->generate();
 	}
 
 private:
-	std::shared_ptr<PDF> _p[2];
+	std::array<std::shared_ptr<PDF>, 2> _p;
 };
 
 } // namespace rt

@@ -1,16 +1,23 @@
 #include "rt/apps/RandomSpheres.hpp"
-#include <iostream>
+#include "rt/SoftTracer.hpp"
+#include "rt/core/Camera.hpp"
+#include "rt/hittables/Scene.hpp"
+#include "rt/hittables/Sphere.hpp"
+#include "rt/materials/Lambertian.hpp"
+#include "rt/materials/Metal.hpp"
+
+#include <fmt/base.h>
 
 namespace rt {
 void RandomSpheresApp::run() {
-	std::cout << "Running Random Spheres Scene..." << std::endl;
+	fmt::println("Running Random Spheres Scene...");
 
 	// Image
-	constexpr auto aspect_ratio = 16.0 / 9.0;
-	constexpr int image_width = 400;
-	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-	constexpr int samples_per_pixel = 100;
-	constexpr int max_depth = 50;
+	constexpr auto ASPECT_RATIO = 16.0 / 9.0;
+	constexpr int IMAGE_WIDTH = 400;
+	constexpr int IMAGE_HEIGHT = static_cast<int>(IMAGE_WIDTH / ASPECT_RATIO);
+	constexpr int SAMPLES_PER_PIXEL = 100;
+	constexpr int MAX_DEPTH = 50;
 
 	// World
 	Scene world;
@@ -26,11 +33,11 @@ void RandomSpheresApp::run() {
 	world.add(std::make_shared<Sphere>(glm::vec3( 1.0,    0.0, -1.0),   0.5, material_right));
 
 	// Camera
-	Camera cam(glm::vec3(0,0,0), glm::vec3(0,0,-1), glm::vec3(0,1,0), 90, aspect_ratio);
+	Camera cam(glm::vec3(0,0,0), glm::vec3(0,0,-1), glm::vec3(0,1,0), 90, ASPECT_RATIO);
 
 	// Render
 	auto lights = std::make_shared<Scene>();
-	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+	SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 	tracer.set_background(glm::vec3(0.70, 0.80, 1.00), true); // Use sky gradient
 	tracer.render(world, lights, cam, "random_spheres.png");
 }

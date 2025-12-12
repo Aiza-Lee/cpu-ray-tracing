@@ -1,0 +1,50 @@
+# --- 基础缩进与排版 ---
+IndentWidth: 4
+TabWidth: 4
+UseTab: Always              # 保持你原有的 Tab 设置
+ColumnLimit: 120            # 行宽限制
+AccessModifierOffset: -4    # public/private 关键字向左偏移 4 格
+
+# --- 大括号与换行风格 ---
+BreakBeforeBraces: Attach    # 大括号不换行 (K&R/One True Brace Style)
+IndentCaseLabels: true       # switch case 不增加缩进
+NamespaceIndentation: None   # namespace 内部增加缩进
+
+# --- 空格控制 ---
+SpaceBeforeParens: ControlStatementsExceptControlMacros    # if/for/while 后加空格
+SpacesInParentheses: false              # 括号内不加空格 (x) 而不是 ( x )
+SpaceBeforeAssignmentOperators: true    # 赋值号两边加空格
+SpaceBeforeInheritanceColon: true       # 继承冒号前加空格
+SpaceBeforeCtorInitializerColon: true   # 构造函数初始化冒号前加空格
+
+# --- 指针与引用 ---
+PointerAlignment: Left      # int* p (左对齐)
+
+# --- 包含文件管理 ---
+SortIncludes: false         # 自动排序头文件
+IncludeBlocks: Regroup      # 自动将头文件分组 (系统头文件、第三方、本项目)
+IncludeCategories:
+  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
+    Priority:        2
+    SortPriority:    2
+    CaseSensitive:   true
+  - Regex:           '^((<|")(gtest|gmock|isl|json)/)'
+    Priority:        3
+  - Regex:           '<[[:alnum:].]+>'
+    Priority:        4
+  - Regex:           '.*'
+    Priority:        1
+    SortPriority:    0
+
+# --- Align 行为 ---
+AlignAfterOpenBracket: Align     # 函数参数换行时，左对齐
+AlignTrailingComments: true     # 对齐行尾注释
+AlignArrayOfStructures: Right   # 结构体数组对齐
+# AlignConsecutiveAssignments: Consecutive # 连续赋值语句对齐
+
+# --- 其他 ---
+AllowShortFunctionsOnASingleLine: Empty    # 允许short函数写在一行
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse # if 语句单行
+BreakConstructorInitializers: AfterColon  # 构造函数初始化列表换行
+FixNamespaceComments: true                     # 自动在 namespace 结束的大括号后添加注释 // namespace foo
+ReflowComments: true                       # 自动重排注释以适应行宽

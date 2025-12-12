@@ -1,4 +1,10 @@
 #include "rt/apps/SimpleLight.hpp"
+#include "rt/SoftTracer.hpp"
+#include "rt/hittables/Quad.hpp"
+#include "rt/hittables/Scene.hpp"
+#include "rt/hittables/Sphere.hpp"
+#include "rt/materials/DiffuseLight.hpp"
+#include "rt/materials/Lambertian.hpp"
 #include <iostream>
 
 namespace rt {
@@ -6,11 +12,11 @@ void SimpleLightApp::run() {
 	std::cout << "Running Simple Light Scene..." << std::endl;
 
 	// Image
-	constexpr auto aspect_ratio = 16.0 / 9.0;
-	constexpr int image_width = 400;
-	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-	constexpr int samples_per_pixel = 800;
-	constexpr int max_depth = 200;
+	constexpr auto ASPECT_RATIO = 16.0 / 9.0;
+	constexpr int IMAGE_WIDTH = 400;
+	constexpr int IMAGE_HEIGHT = static_cast<int>(IMAGE_WIDTH / ASPECT_RATIO);
+	constexpr int SAMPLES_PER_PIXEL = 800;
+	constexpr int MAX_DEPTH = 200;
 
 	// World
 	Scene world;
@@ -34,10 +40,10 @@ void SimpleLightApp::run() {
 	lights->add(light_rect);
 
 	// Camera
-	Camera cam(glm::vec3(26,3,6), glm::vec3(0,2,0), glm::vec3(0,1,0), 20, aspect_ratio);
+	Camera cam(glm::vec3(26,3,6), glm::vec3(0,2,0), glm::vec3(0,1,0), 20, ASPECT_RATIO);
 
 	// Render
-	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+	SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 	tracer.set_background(glm::vec3(0,0,0), false); // Black background
 	tracer.render(world, lights, cam, "simple_light.png");
 }

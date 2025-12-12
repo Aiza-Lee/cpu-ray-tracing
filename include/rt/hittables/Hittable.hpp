@@ -9,12 +9,19 @@ namespace rt {
  * @brief 描述可被光线击中的对象的抽象基类。
  */
 class Hittable {
+protected:
+	Hittable() = default;
+
 public:
+	Hittable(const Hittable&) = default;
+	Hittable(Hittable&&) = delete;
+	Hittable& operator=(const Hittable&) = default;
+	Hittable& operator=(Hittable&&) = delete;
 	virtual ~Hittable() = default;
 
 	/**
 	 * @brief 判断光线是否击中对象。
-	 * 
+	 *
 	 * @param r 待测试的光线。
 	 * @param t_min 有效击中范围的最小 t 值。
 	 * @param t_max 有效击中范围的最大 t 值。
@@ -26,7 +33,7 @@ public:
 
 	/**
 	 * @brief 计算从给定原点沿指定方向采样到该对象的概率密度函数 (PDF) 值。
-	 * 
+	 *
 	 * @param origin 采样的原点。
 	 * @param v 采样方向。
 	 */
@@ -34,7 +41,7 @@ public:
 
 	/**
 	 * @brief 从给定的原点产生指向该对象的随机方向。
-	 * 
+	 *
 	 * @param origin 采样的原点。
 	 */
 	[[nodiscard]] virtual glm::vec3 random(const glm::vec3& origin) const = 0;

@@ -9,3 +9,5 @@ out/
 *.obj
 vcpkg_installed/
 /*.png
+/.cache
+/compile_commands.json

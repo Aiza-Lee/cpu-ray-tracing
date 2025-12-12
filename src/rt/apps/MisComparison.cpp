@@ -1,4 +1,11 @@
 #include "rt/apps/MisComparison.hpp"
+#include "rt/SoftTracer.hpp"
+#include "rt/core/Camera.hpp"
+#include "rt/hittables/Scene.hpp"
+#include "rt/hittables/Sphere.hpp"
+#include "rt/materials/DiffuseLight.hpp"
+#include "rt/materials/Lambertian.hpp"
+#include "rt/materials/Metal.hpp"
 #include <iostream>
 #include <fmt/core.h>
 
@@ -10,11 +17,11 @@ void MisComparisonApp::run() {
 	std::cout << "Running MIS Comparison Scene..." << std::endl;
 
 	// Image
-	constexpr auto aspect_ratio = 1.0;
-	constexpr int image_width = 400;
-	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-	constexpr int samples_per_pixel = 100;
-	constexpr int max_depth = 70;
+	constexpr auto ASPECT_RATIO = 1.0;
+	constexpr int IMAGE_WIDTH = 400;
+	constexpr int IMAGE_HEIGHT = static_cast<int>(IMAGE_WIDTH / ASPECT_RATIO);
+	constexpr int SAMPLES_PER_PIXEL = 100;
+	constexpr int MAX_DEPTH = 70;
 
 	// World
 	Scene world;
@@ -75,12 +82,12 @@ void MisComparisonApp::run() {
 	// world.add(std::make_shared<Quad>(glm::vec3(-1000, 1000, 400), glm::vec3(2000, 0, 0), glm::vec3(0, 0, -2500), gray));
 	
 	// Camera
-	Camera cam(cam_pos, glm::vec3(0, 180, 0), glm::vec3(0,1,0), 50, aspect_ratio);
+	Camera cam(cam_pos, glm::vec3(0, 180, 0), glm::vec3(0,1,0), 50, ASPECT_RATIO);
 
 	// Render 1: MIS (Default)
 	{
 		fmt::print("\nRendering with MIS (Mixture Sampling)...\n");
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
 		tracer.set_sampling_strategy(SamplingStrategy::MIS);
 		tracer.render(world, lights, cam, "mis_comparison_1_mis.png");
@@ -89,40 +96,41 @@ void MisComparisonApp::run() {
 	// Render 2: Light Sampling Only
 	{
 		fmt::print("\nRendering with Light Sampling Only (NEE)...\n");
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
-		tracer.set_sampling_strategy(SamplingStrategy::Light);
+		tracer.set_sampling_strategy(SamplingStrategy::LIGHT);
 		tracer.render(world, lights, cam, "mis_comparison_2_light.png");
 	}
 
 	// Render 3: Material Sampling Only
 	{
 		fmt::print("\nRendering with Material Sampling Only (Standard Path Tracing)...\n");
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
-		tracer.set_sampling_strategy(SamplingStrategy::Material);
+		tracer.set_sampling_strategy(SamplingStrategy::MATERIAL);
 		tracer.render(world, lights, cam, "mis_comparison_3_material.png");
 	}
 }
 
-std::shared_ptr<Quad> MisComparisonApp::m_build_mirror(const glm::vec3& S, const glm::vec3& V, const glm::vec3& P, std::shared_ptr<Material> material) {
+std::shared_ptr<Quad> MisComparisonApp::m_build_mirror(const glm::vec3& light, const glm::vec3& eye, const glm::vec3& pos, std::shared_ptr<Material> material) {
 
-	auto i = glm::normalize(P - S); // 入射方向
-	auto r = glm::normalize(V - P); // 观察方向
+	auto i = glm::normalize(pos - light); // 入射方向
+	auto r = glm::normalize(eye - pos); // 观察方向
 	auto n = glm::normalize(i - r); // 法线方向
 
-	auto reflected = i - 2.0f * glm::dot(i, n) * n;
+	auto reflected = i - 2.0F * glm::dot(i, n) * n;
 
 	if (glm::length(reflected - r) > 1e-8 && glm::length(reflected + r) < glm::length(reflected - r)) {
 		n = -n;
 	}
 
-	auto siz = 120.0f, length = 550.0f;
+	auto siz = 120.0F;
+	auto length = 550.0F;
 
 	auto len = glm::vec3(length, 0, 0);
 	auto wid = glm::normalize(glm::cross(n, len)) * siz;
 
-	return std::make_shared<Quad>(P - len * 0.5f - wid * 0.5f, len, wid, material);
+	return std::make_shared<Quad>(pos - len * 0.5F - wid * 0.5F, len, wid, material);
 }
 
 } // namespace rt

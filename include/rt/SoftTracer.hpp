@@ -8,8 +8,8 @@ namespace rt {
 
 enum class SamplingStrategy {
 	MIS,        ///< 多重重要性采样 (默认)
-	Material,   ///< 仅材质采样 (BSDF)
-	Light       ///< 仅光源采样 (NEE)
+	MATERIAL,   ///< 仅材质采样 (BSDF)
+	LIGHT       ///< 仅光源采样 (NEE)
 };
 
 /**
@@ -50,7 +50,7 @@ public:
 // --- Constants ---
 	static constexpr double RAY_T_MIN = 0.001;         ///< 光线相交检测的最小 t 值（防止自相交）。
 	static constexpr int RR_START_BOUNCE = 3;          ///< 开始俄罗斯轮盘赌的弹射次数。
-	static constexpr float RR_MIN_PROBABILITY = 0.05f; ///< 俄罗斯轮盘赌的最小继续概率。
+	static constexpr float RR_MIN_PROBABILITY = 0.05F; ///< 俄罗斯轮盘赌的最小继续概率。
 
 	/**
 	 * @brief 从相机视角渲染场景。
@@ -81,10 +81,10 @@ private:
 	 * @param index 缓冲区中的索引。
 	 * @param pixel_color 要写入的颜色。
 	 */
-	void m_write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color);
+	static void _write_color(std::vector<unsigned char>& image_data, int index, glm::vec3 pixel_color);
 
-	int m_image_width;       ///< 图像宽度。
-	int m_image_height;      ///< 图像高度。
+	int _image_width;       ///< 图像宽度。
+	int _image_height;      ///< 图像高度。
 	int m_samples_per_pixel; ///< 每个像素的采样数。
 	int m_max_depth;         ///< 最大递归深度。
 	glm::vec3 m_background_color = glm::vec3(0,0,0);

@@ -1,4 +1,12 @@
 #include "rt/apps/CornerBox.hpp"
+#include "rt/SoftTracer.hpp"
+#include "rt/core/Camera.hpp"
+#include "rt/hittables/Quad.hpp"
+#include "rt/hittables/Scene.hpp"
+#include "rt/hittables/Sphere.hpp"
+#include "rt/materials/DiffuseLight.hpp"
+#include "rt/materials/Lambertian.hpp"
+
 #include <iostream>
 
 namespace rt {
@@ -7,11 +15,11 @@ void CornerBoxApp::run() {
 	std::cout << "Running Cornell Box Scene..." << std::endl;
 
 	// Image
-	constexpr auto aspect_ratio = 1.0;
-	constexpr int image_width = 600;
-	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-	constexpr int samples_per_pixel = 300;
-	constexpr int max_depth = 70;
+	constexpr double ASPECT_RATIO	= 1.0;
+	constexpr int IMAGE_WIDTH		= 600;
+	constexpr int IMAGE_HEIGHT		= static_cast<int>(IMAGE_WIDTH / ASPECT_RATIO);
+	constexpr int SAMPLES_PER_PIXEL = 300;
+	constexpr int MAX_DEPTH			= 70;
 
 	// World
 	Scene world;
@@ -23,22 +31,23 @@ void CornerBoxApp::run() {
 
 	// Cornell box walls
 	// YZ plane (Left Green)
-	world.add(std::make_shared<Quad>(glm::vec3(555,0,0), glm::vec3(0,555,0), glm::vec3(0,0,555), green));
+	world.add(std::make_shared<Quad>(glm::vec3(555, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), green));
 	// YZ plane (Right Red)
-	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(0,555,0), glm::vec3(0,0,555), red));
+	world.add(std::make_shared<Quad>(glm::vec3(0, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), red));
 	// XZ plane (Light)
-	auto light_shape = std::make_shared<Quad>(glm::vec3(343, 554, 332), glm::vec3(-130,0,0), glm::vec3(0,0,-105), light);
+	auto light_shape =
+		std::make_shared<Quad>(glm::vec3(343, 554, 332), glm::vec3(-130, 0, 0), glm::vec3(0, 0, -105), light);
 	world.add(light_shape);
-	
+
 	auto lights = std::make_shared<Scene>();
 	lights->add(light_shape);
 
 	// XZ plane (Floor White)
-	world.add(std::make_shared<Quad>(glm::vec3(0,0,0), glm::vec3(555,0,0), glm::vec3(0,0,555), white));
+	world.add(std::make_shared<Quad>(glm::vec3(0, 0, 0), glm::vec3(555, 0, 0), glm::vec3(0, 0, 555), white));
 	// XZ plane (Ceiling White)
-	world.add(std::make_shared<Quad>(glm::vec3(0,555,0), glm::vec3(555,0,0), glm::vec3(0,0,555), white));
+	world.add(std::make_shared<Quad>(glm::vec3(0, 555, 0), glm::vec3(555, 0, 0), glm::vec3(0, 0, 555), white));
 	// XY plane (Back White)
-	world.add(std::make_shared<Quad>(glm::vec3(0,0,555), glm::vec3(555,0,0), glm::vec3(0,555,0), white));
+	world.add(std::make_shared<Quad>(glm::vec3(0, 0, 555), glm::vec3(555, 0, 0), glm::vec3(0, 555, 0), white));
 
 	// Box 1
 	// world.add(box(glm::vec3(130, 0, 65), glm::vec3(295, 165, 230), white));
@@ -48,11 +57,11 @@ void CornerBoxApp::run() {
 	world.add(std::make_shared<Sphere>(glm::vec3(278, 100, 278), 100, white));
 
 	// Camera
-	Camera cam(glm::vec3(278, 278, -800), glm::vec3(278, 278, 0), glm::vec3(0,1,0), 40, aspect_ratio);
+	Camera cam(glm::vec3(278, 278, -800), glm::vec3(278, 278, 0), glm::vec3(0, 1, 0), 40, ASPECT_RATIO);
 
 	// Render
-	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
-	tracer.set_background(glm::vec3(0,0,0), false);
+	SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
+	tracer.set_background(glm::vec3(0, 0, 0), false);
 	tracer.render(world, lights, cam, "corner_box.png");
 }
 } // namespace rt

@@ -1,15 +1,23 @@
 #include "rt/apps/CompareSampling.hpp"
+#include "rt/SoftTracer.hpp"
+#include "rt/core/Camera.hpp"
+#include "rt/hittables/Quad.hpp"
+#include "rt/hittables/Scene.hpp"
+#include "rt/hittables/Sphere.hpp"
+#include "rt/materials/DiffuseLight.hpp"
+#include "rt/materials/Lambertian.hpp"
+#include "rt/materials/WrongLambertian.hpp"
 #include <fmt/core.h>
 
 void rt::CompareSamplingApp::run() {
 	fmt::println("Running CompareSampling...");
 
 	// Image
-	constexpr auto aspect_ratio = 1.0;
-	constexpr int image_width = 600;
-	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
+	constexpr auto ASPECT_RATIO = 1.0;
+	constexpr int IMAGE_WIDTH = 600;
+	constexpr int IMAGE_HEIGHT = static_cast<int>(IMAGE_WIDTH / ASPECT_RATIO);
 
-	constexpr int max_depth = 70;
+	constexpr int MAX_DEPTH = 70;
 
 	// World
 	Scene world;
@@ -43,43 +51,43 @@ void rt::CompareSamplingApp::run() {
 	glm::vec3 lookat(278, 278, 0);
 	glm::vec3 vup(0, 1, 0);
 		
-	Camera cam(lookfrom, lookat, vup, 40, aspect_ratio);
+	Camera cam(lookfrom, lookat, vup, 40, ASPECT_RATIO);
 
 	// 16
 	{
 		fmt::println("16 Samples per Pixel - Material Sampling Only...");
-		constexpr int samples_per_pixel = 16; 
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		constexpr int SAMPLES_PER_PIXEL = 16; 
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
-		tracer.set_sampling_strategy(SamplingStrategy::Material);
+		tracer.set_sampling_strategy(SamplingStrategy::MATERIAL);
 		tracer.render(world, lights, cam, "compare_sampling_16.png");
 	}
 	// 50
 	{
 		fmt::println("50 Samples per Pixel - Material Sampling Only...");
-		constexpr int samples_per_pixel = 50; 
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		constexpr int SAMPLES_PER_PIXEL = 50; 
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
-		tracer.set_sampling_strategy(SamplingStrategy::Material);
+		tracer.set_sampling_strategy(SamplingStrategy::MATERIAL);
 		tracer.render(world, lights, cam, "compare_sampling_50.png");
 	
 	}
 	// 100
 	{
 		fmt::println("100 Samples per Pixel - Material Sampling Only...");
-		constexpr int samples_per_pixel = 100; 
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		constexpr int SAMPLES_PER_PIXEL = 100; 
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
-		tracer.set_sampling_strategy(SamplingStrategy::Material);
+		tracer.set_sampling_strategy(SamplingStrategy::MATERIAL);
 		tracer.render(world, lights, cam, "compare_sampling_100.png");
 	}
 	// 1000
 	{
 		fmt::println("1000 Samples per Pixel - Material Sampling Only...");
-		constexpr int samples_per_pixel = 1000; 
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		constexpr int SAMPLES_PER_PIXEL = 1000; 
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
-		tracer.set_sampling_strategy(SamplingStrategy::Material);
+		tracer.set_sampling_strategy(SamplingStrategy::MATERIAL);
 		tracer.render(world, lights, cam, "compare_sampling_1000.png");
 	}
 

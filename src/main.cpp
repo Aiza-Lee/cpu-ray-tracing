@@ -7,7 +7,6 @@
 #include "rt/apps/Playground.hpp"
 #include "rt/apps/CompareSampling.hpp"
 
-#include <string>
 #include <fmt/core.h>
 #include <iostream>
 #include <vector>

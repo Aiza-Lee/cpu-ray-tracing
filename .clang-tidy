@@ -1,0 +1,61 @@
+  # -*,
+Checks: >
+  bugprone-*,
+  cppcoreguidelines-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-prefer-member-initializer,
+  -modernize-use-trailing-return-type,
+  -readability-magic-numbers,
+  -readability-implicit-bool-conversion,
+  -readability-identifier-length
+WarningsAsErrors: ' '
+HeaderFilterRegex: '.*'
+FormatStyle: none
+CheckOptions:
+  # 类、结构体、枚举类型
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumCase
+    value: CamelCase
+  # 枚举值（C++11 前用 UPPER_CASE，后可用 CamelCase）
+  - key: readability-identifier-naming.EnumConstantCase
+    value: UPPER_CASE
+  # 函数和变量
+  # - key: readability-identifier-naming.FunctionCase
+  #   value: lower_case
+  # - key: readability-identifier-naming.VariableCase
+  #   value: lower_case
+  # 常量
+  # - key: readability-identifier-naming.ConstantCase
+  #   value: UPPER_CASE
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: UPPER_CASE
+  # 成员变量（可选前缀）
+  # - key: readability-identifier-naming.MemberCase
+  #   value: lower_case
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: UPPER_CASE
+  # 命名空间、参数、局部变量
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  # - key: readability-identifier-naming.ParameterCase
+  #   value: lower_case
+  # - key: readability-identifier-naming.LocalVariableCase
+  #   value: lower_case
+  # const-correctness
+  # - key: misc-const-correctness.TransformValues
+  #   value: true
+  # - key: misc-const-correctness.WarnPointersAsValues
+  #   value: false
+  # 允许 POD 类型
+  - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: true
+  - key: readability-braces-around-statements.ShortStatementLines
+    value: 2

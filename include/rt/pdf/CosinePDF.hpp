@@ -24,7 +24,7 @@ public:
 
 	[[nodiscard]] double value(const glm::vec3& direction) const override {
 		const auto cosine = glm::dot(glm::normalize(direction), _uvw.w());
-		return (cosine <= 0) ? 0 : cosine / pi;
+		return (cosine <= 0) ? 0 : cosine / PI;
 	}
 
 	[[nodiscard]] glm::vec3 generate() const override {
@@ -37,7 +37,7 @@ public:
 	}
 
 private:
-	ONB _uvw;
+	ONB _uvw{};
 };
 
 } // namespace rt

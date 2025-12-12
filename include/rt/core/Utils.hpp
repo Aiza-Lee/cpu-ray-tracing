@@ -5,30 +5,25 @@
 #include <glm/gtx/norm.hpp>
 #include <random>
 #include <limits>
-#include <memory>
 
 namespace rt {
 
-using std::shared_ptr;
-using std::make_shared;
-using std::sqrt;
-
-const double infinity = std::numeric_limits<double>::infinity();
-const double pi = glm::pi<double>();
+const double DOUBLE_INF = std::numeric_limits<double>::max();
+const double PI = glm::pi<double>();
 
 /**
  * @brief 角度转换为弧度。
- * 
+ *
  * @param degrees 角度值。
  * @return double 弧度值。
  */
 inline double degrees_to_radians(const double degrees) {
-	return degrees * pi / 180.0;
+	return degrees * PI / 180.0;
 }
 
 /**
  * @brief 生成一个在 [0, 1) 范围内的随机双精度浮点数。
- * 
+ *
  * @return double 随机数。
  */
 inline double random_double() {
@@ -39,7 +34,7 @@ inline double random_double() {
 
 /**
  * @brief 生成一个在 [min, max) 范围内的随机双精度浮点数。
- * 
+ *
  * @param min 最小值。
  * @param max 最大值。
  * @return double 随机数。
@@ -56,17 +51,17 @@ inline int random_int(const int min, const int max) {
  * @brief 生成一个分量在 [0, 1) 范围内的随机向量。
  */
 inline glm::vec3 random_vec3() {
-	return glm::vec3(random_double(), random_double(), random_double());
+	return {random_double(), random_double(), random_double()};
 }
 
 /**
  * @brief 生成一个分量在 [min, max) 范围内的随机向量。
- * 
+ *
  * @param min 最小值。
  * @param max 最大值。
  */
 inline glm::vec3 random_vec3(const double min, const double max) {
-	return glm::vec3(random_double(min,max), random_double(min,max), random_double(min,max));
+	return {random_double(min, max), random_double(min, max), random_double(min, max)};
 }
 
 /**
@@ -75,12 +70,12 @@ inline glm::vec3 random_vec3(const double min, const double max) {
 inline glm::vec3 random_cosine_direction() {
 	auto r01 = random_double();
 	auto z = sqrt(1 - r01);
-	
-	auto phi = 2 * pi * random_double();
+
+	auto phi = 2 * PI * random_double();
 	auto x = cos(phi) * sqrt(r01);
 	auto y = sin(phi) * sqrt(r01);
-	
-	return glm::vec3(x, y, z);
+
+	return {x, y, z};
 }
 
 /**
@@ -88,12 +83,12 @@ inline glm::vec3 random_cosine_direction() {
  */
 inline glm::vec3 random_to_sphere(const double radius, const double distance_squared) {
 	auto z = random_double(std::sqrt(1 - radius * radius / distance_squared), 1);
-	
-	auto phi = 2 * pi * random_double();
+
+	auto phi = 2 * PI * random_double();
 	auto x = cos(phi) * sqrt(1 - z * z);
 	auto y = sin(phi) * sqrt(1 - z * z);
-	
-	return glm::vec3(x, y, z);
+
+	return {x, y, z};
 }
 
 /**
@@ -102,15 +97,15 @@ inline glm::vec3 random_to_sphere(const double radius, const double distance_squ
 inline glm::vec3 random_unit_to_sphere() {
 	auto z = random_double(-1, 1);
 	auto r = std::sqrt(1 - z * z);
-	auto phi = 2 * pi * random_double();
-	return glm::vec3(r * std::cos(phi), r * std::sin(phi), z);
+	auto phi = 2 * PI * random_double();
+	return {r * std::cos(phi), r * std::sin(phi), z};
 }
 
 /**
  * @brief 在单位球体内生成一个随机点。
  */
 inline glm::vec3 random_in_unit_sphere() {
-	float r = std::cbrt(random_double());
+	auto r = static_cast<float>(std::cbrt(random_double()));
 	return r * random_unit_to_sphere();
 }
 

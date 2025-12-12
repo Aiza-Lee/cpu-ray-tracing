@@ -11,7 +11,7 @@ namespace rt {
  */
 class Sphere : public Hittable {
 public:
-	Sphere() : radius(0){}
+	Sphere() : _radius(0){}
 
 	/**
 	 * @brief 构造一个新的球体对象。
@@ -21,7 +21,7 @@ public:
 	 * @param m 球体的材质。
 	 */
 	Sphere(const glm::vec3 cen, const double r, std::shared_ptr<Material> m)
-		: center(cen), radius(r), mat_ptr(std::move(m)) {};
+		: _center(cen), _radius(r), _mat_ptr(std::move(m)) {};
 
 	/**
 	 * @brief 判断光线是否击中球体。
@@ -38,10 +38,10 @@ public:
 	[[nodiscard]] double pdf_value(const glm::vec3& origin, const glm::vec3& v) const override;
 	[[nodiscard]] glm::vec3 random(const glm::vec3& origin) const override;
 
-public:
-	glm::vec3 center{};   ///< 球心
-	double radius;                     ///< 球体的半径。
-	std::shared_ptr<Material> mat_ptr; ///< 球体的材质。
+private:
+	glm::vec3 _center{};   ///< 球心
+	double _radius;                     ///< 球体的半径。
+	std::shared_ptr<Material> _mat_ptr; ///< 球体的材质。
 };
 
 } // namespace rt

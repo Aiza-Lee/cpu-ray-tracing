@@ -6,9 +6,8 @@ namespace rt {
 
 class CornerBoxApp : public Application {
 public:
-	~CornerBoxApp() override = default;
 	void run() override;
-	std::string name() const override { return "Cornell Box Scene"; }
+	[[nodiscard]] std::string name() const override { return "Cornell Box Scene"; }
 };
 
 } // namespace rt

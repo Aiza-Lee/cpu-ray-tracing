@@ -1,18 +1,25 @@
 #include "rt/apps/SimpleLightWrong.hpp"
-#include <iostream>
+#include "rt/SoftTracer.hpp"
+#include "rt/core/Camera.hpp"
+#include "rt/hittables/Quad.hpp"
+#include "rt/hittables/Scene.hpp"
+#include "rt/hittables/Sphere.hpp"
+#include "rt/materials/DiffuseLight.hpp"
+#include "rt/materials/Lambertian.hpp"
+#include <fmt/base.h>
 
 namespace rt {
 void SimpleLightWrongApp::run() {
-	std::cout << "Running Comparison Scene (Cosine vs Uniform)..." << std::endl;
+	fmt::println("Running Comparison Scene (Cosine vs Uniform)...");
 
 	// Image
-	constexpr auto aspect_ratio = 1.0;
-	constexpr int image_width = 600;
-	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
+	constexpr auto ASPECT_RATIO = 1.0;
+	constexpr int IMAGE_WIDTH = 600;
+	constexpr int IMAGE_HEIGHT = static_cast<int>(IMAGE_WIDTH / ASPECT_RATIO);
 		
 	// !!! 关键：使用低采样数来凸显噪声差异 !!!
-	constexpr int samples_per_pixel = 1000;
-	constexpr int max_depth = 50;
+	constexpr int SAMPLES_PER_PIXEL = 1000;
+	constexpr int MAX_DEPTH = 50;
 
 	// World
 	Scene world;
@@ -44,7 +51,7 @@ void SimpleLightWrongApp::run() {
 
 	// 右球：Wrong Lambertian (Uniform Sampling)
 	// 预期结果：表面会有明显的噪点，特别是在阴影过渡区域
-	auto mat_wrong = std::make_shared<WrongLambertian>(glm::vec3(0.8, 0.8, 0.8));
+	auto mat_wrong = std::make_shared<Lambertian>(glm::vec3(0.8, 0.8, 0.8));
 	world.add(std::make_shared<Sphere>(glm::vec3(375, 100, 250), 100, mat_wrong));
 
 	// Camera
@@ -52,10 +59,10 @@ void SimpleLightWrongApp::run() {
 	glm::vec3 lookat(278, 278, 0);
 	glm::vec3 vup(0, 1, 0);
 		
-	Camera cam(lookfrom, lookat, vup, 40, aspect_ratio);
+	Camera cam(lookfrom, lookat, vup, 40, ASPECT_RATIO);
 
 	// Render
-	SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+	SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 	tracer.set_background(glm::vec3(0,0,0), false);
 	tracer.render(world, lights, cam, "comparison_sampling.png");
 }

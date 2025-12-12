@@ -1,4 +1,12 @@
 #include "rt/apps/Playground.hpp"
+#include "rt/SoftTracer.hpp"
+#include "rt/hittables/Quad.hpp"
+#include "rt/hittables/Scene.hpp"
+#include "rt/hittables/Sphere.hpp"
+#include "rt/materials/DiffuseLight.hpp"
+#include "rt/materials/Lambertian.hpp"
+#include "rt/materials/Metal.hpp"
+#include <fmt/base.h>
 #include <iostream>
 #include <fmt/core.h>
 
@@ -7,12 +15,12 @@ void PlaygroundApp::run() {
 	std::cout << "Running Playground..." << std::endl;
 
 	// Image
-	constexpr auto aspect_ratio = 1.0;
-	constexpr int image_width = 600;
-	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
+	constexpr auto ASPECT_RATIO = 1.0;
+	constexpr int IMAGE_WIDTH = 600;
+	constexpr int IMAGE_HEIGHT = static_cast<int>(IMAGE_WIDTH / ASPECT_RATIO);
 
-	constexpr int samples_per_pixel = 300;
-	constexpr int max_depth = 50;
+	constexpr int SAMPLES_PER_PIXEL = 300;
+	constexpr int MAX_DEPTH = 50;
 
 	// World
 	Scene world;
@@ -46,12 +54,12 @@ void PlaygroundApp::run() {
 	glm::vec3 lookat(278, 278, 0);
 	glm::vec3 vup(0, 1, 0);
 		
-	Camera cam(lookfrom, lookat, vup, 40, aspect_ratio);
+	Camera cam(lookfrom, lookat, vup, 40, ASPECT_RATIO);
 
 	// Render 1: MIS (Default)
 	{
 		fmt::print("\nRendering with MIS (Mixture Sampling)...\n");
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
 		tracer.set_sampling_strategy(SamplingStrategy::MIS);
 		tracer.render(world, lights, cam, "playground_mis.png");
@@ -60,18 +68,18 @@ void PlaygroundApp::run() {
 	// Render 2: Light Sampling Only
 	{
 		fmt::print("\nRendering with Light Sampling Only (NEE)...\n");
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
-		tracer.set_sampling_strategy(SamplingStrategy::Light);
+		tracer.set_sampling_strategy(SamplingStrategy::LIGHT);
 		tracer.render(world, lights, cam, "playground_light.png");
 	}
 
 	// Render 3: Material Sampling Only
 	{
 		fmt::print("\nRendering with Material Sampling Only (Standard Path Tracing)...\n");
-		SoftTracer tracer(image_width, image_height, samples_per_pixel, max_depth);
+		SoftTracer tracer(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL, MAX_DEPTH);
 		tracer.set_background(glm::vec3(0,0,0), false);
-		tracer.set_sampling_strategy(SamplingStrategy::Material);
+		tracer.set_sampling_strategy(SamplingStrategy::MATERIAL);
 		tracer.render(world, lights, cam, "playground_material.png");
 	}
 }
